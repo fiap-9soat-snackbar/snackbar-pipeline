@@ -1,0 +1,85 @@
+name: MultiStage Pipeline
+
+on:
+  repository_dispatch:
+    types: [infra_commit, app_commit, api_commit, lambda_commit, db_commit]
+
+jobs:
+  infra_pipeline:
+    if: github.event.action == 'infra_commit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Kubernetes Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/eks'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+  app_pipeline:
+    if: github.event.action == 'app_commit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout App Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/snackbar'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Run Tests
+        run: mvn -f backend/pom.xml test 
+
+      - name: Build App
+        run: npm -f backend/pom.xml run build
+
+      - name: Deploy App
+        run: ./deploy.sh
+
+  api_pipeline:
+    if: github.event.action == 'api_commit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout API Gateway Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/api-gateway'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Deploy API Gateway
+        run: terraform apply -auto-approve
+
+  lambda_pipeline:
+    if: github.event.action == 'lambda_commit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Lambda Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/lambda'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Deploy Lambda
+        run: terraform apply -auto-approve
+
+  db_pipeline:
+    if: github.event.action == 'db_commit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DB Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/db'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Apply DB Changes
+        run: terraform apply -auto-approve

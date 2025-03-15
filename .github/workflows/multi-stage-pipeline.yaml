@@ -20,11 +20,19 @@ jobs:
         with:
           terraform_version: 1.0.0
 
-      - name: Terraform Init
+      - name: Init S3 Provisioner
         run: terraform init
+        working-directory: terraform/us-east-1/storage/s3
 
-      - name: Terraform Apply
+      - name: Plan S3 Provisioner
+        run: terraform plan
+        working-directory: terraform/us-east-1/storage/s3
+
+      - name: Apply S3 Provisioner
+        if: ${{ success() }}
         run: terraform apply -auto-approve
+        working-directory: terraform/us-east-1/storage/s3
+        
 
   app_pipeline:
     if: github.event.action == 'app_commit'

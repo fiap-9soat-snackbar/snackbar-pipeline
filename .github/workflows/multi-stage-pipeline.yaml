@@ -245,11 +245,12 @@ jobs:
         restore-keys: ${{ runner.os }}-maven-
 
     - name: Run SonarCloud Analysis
-      run: mvn -f backend/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
-            -Dsonar.projectKey=fiap-9soat-snackbar_snackbar \
-            -Dsonar.organization=fiap-9soat-snackbar \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      run: |
+        mvn -f backend/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
+          -Dsonar.projectKey=fiap-9soat-snackbar_snackbar \
+          -Dsonar.organization=fiap-9soat-snackbar \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
   build-and-push:
     runs-on: ubuntu-latest

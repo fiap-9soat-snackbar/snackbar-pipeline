@@ -37,7 +37,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform destroy
+        run: terraform destroy -auto-approve
         working-directory: terraform/us-east-1/network/vpc  
 
   securitygroup-destroy:
@@ -73,7 +73,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform destroy
+        run: terraform destroy -auto-approve
         working-directory: terraform/us-east-1/compute/securitygroup  
         
   eks-destroy:
@@ -109,7 +109,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform destroy
+        run: terraform destroy -auto-approve
         working-directory: terraform/us-east-1/compute/eks/mithrandir
   
   destroy-bucket:

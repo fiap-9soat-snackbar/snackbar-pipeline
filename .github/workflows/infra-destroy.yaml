@@ -111,6 +111,7 @@ jobs:
         if: ${{ success() }}
         run: terraform destroy -auto-approve
         working-directory: terraform/us-east-1/network/vpc  
+        continue-on-error: true
  
   destroy-bucket:
     runs-on: ubuntu-latest

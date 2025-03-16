@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        if: false
 
       - name: Configure S3 Bucket
         env:
@@ -18,4 +19,23 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: |
-          aws s3api create-bucket --bucket fiap-9soat-snackbar2 --region us-east-1
+          aws s3api create-bucket --bucket fiap-9soat-snackbar --region us-east-1
+
+      - name: Checkout Kubernetes Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/eks'
+          token: ${{ secrets.GH_TOKEN}}          
+          
+      - name: Init Helm
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: |
+          helm plugin install https://github.com/hypnoglow/helm-s3.git
+          helm repo add snackbar-charts s3://fiap-9soat-snackbar
+          helm package helm-chart/snackbar-app/
+          helm s3 push snackbar-app-0.1.0.tgz snackbar-charts
+          

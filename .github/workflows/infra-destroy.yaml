@@ -1,0 +1,131 @@
+name: infra destroy
+
+on:
+    workflow_dispatch:
+
+jobs:
+
+  vpc-destroy:
+    runs-on: ubuntu-latest
+
+    steps:   
+      - name: Checkout Kubernetes Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/eks'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+  
+      - name: Init VPC Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform init
+        working-directory: terraform/us-east-1/network/vpc
+
+
+      - name: Destroy VPC Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        if: ${{ success() }}
+        run: terraform destroy
+        working-directory: terraform/us-east-1/network/vpc  
+
+  securitygroup-destroy:
+    runs-on: ubuntu-latest
+    needs: vpc-destroy
+
+    steps:   
+      - name: Checkout Kubernetes Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/eks'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+  
+      - name: Init Security Group Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform init
+        working-directory: terraform/us-east-1/compute/securitygroup
+
+
+      - name: Destroy Security Group Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        if: ${{ success() }}
+        run: terraform destroy
+        working-directory: terraform/us-east-1/compute/securitygroup  
+        
+  eks-destroy:
+    runs-on: ubuntu-latest
+    needs: securitygroup-destroy
+
+    steps:   
+      - name: Checkout Kubernetes Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/eks'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+  
+      - name: Init EKS Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform init
+        working-directory: terraform/us-east-1/compute/eks/mithrandir
+
+
+      - name: destroy EKS Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        if: ${{ success() }}
+        run: terraform destroy
+        working-directory: terraform/us-east-1/compute/eks/mithrandir
+  
+  destroy-bucket:
+    runs-on: ubuntu-latest
+    needs: eks-destroy
+
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+            
+        - name: Delete S3 Bucket
+          env:
+              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          run: |
+            aws s3 rm s3://fiap-9soat-snackbar --recursive
+            aws s3api delete-bucket --bucket fiap-9soat-snackbar --region us-east-1

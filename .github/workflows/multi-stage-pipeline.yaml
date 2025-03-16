@@ -67,30 +67,30 @@ jobs:
   
       - name: Init VPC Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init
         working-directory: terraform/us-east-1/network/vpc
 
     
       - name: Plan VPC Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan
         working-directory: terraform/us-east-1/network/vpc
 
 
       - name: Apply VPC Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -auto-approve
         working-directory: terraform/us-east-1/network/vpc  
@@ -113,30 +113,30 @@ jobs:
   
       - name: Init Security Group Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init
         working-directory: terraform/us-east-1/compute/securitygroup
 
     
       - name: Plan Security Group Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan
         working-directory: terraform/us-east-1/compute/securitygroup
 
 
       - name: Apply Security Group Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -auto-approve
         working-directory: terraform/us-east-1/compute/securitygroup  
@@ -159,30 +159,30 @@ jobs:
   
       - name: Init EKS Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init
         working-directory: terraform/us-east-1/compute/eks/mithrandir
 
     
       - name: Plan EKS Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan
         working-directory: terraform/us-east-1/compute/eks/mithrandir
 
 
       - name: Apply EKS Setup
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-              AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -auto-approve
         working-directory: terraform/us-east-1/compute/eks/mithrandir
@@ -304,18 +304,28 @@ jobs:
    
         - name: Configure kubectl for EKS
           env:
-               AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-               AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-               AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-               AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           run: aws eks update-kubeconfig --name snackbar-mithrandir --region ${{ secrets.AWS_DEFAULT_REGION }}
    
         - name: Init Helm
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           run: |
                helm plugin install https://github.com/hypnoglow/helm-s3.git
                helm repo add snackbar-charts s3://fiap-9soat-snackbar
    
         - name: Helm Upgrade/Install
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           run: |
                helm upgrade --install snackbar snackbar-charts/snackbar-app \
                --namespace ns-snackbar \

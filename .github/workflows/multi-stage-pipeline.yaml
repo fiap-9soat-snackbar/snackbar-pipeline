@@ -293,6 +293,37 @@ jobs:
     - name: Docker logout
       run: docker logout
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+
+    steps:
+        - name: Install Helm
+          run: |
+               curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+   
+        - name: Configure kubectl for EKS
+          env:
+               AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+               AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+               AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+               AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          run: aws eks update-kubeconfig --name snackbar-mithrandir --region ${{ secrets.AWS_DEFAULT_REGION }}
+   
+        - name: Init Helm
+          run: |
+               helm plugin install https://github.com/hypnoglow/helm-s3.git
+               helm repo add snackbar-charts s3://fiap-9soat-snackbar
+   
+        - name: Helm Upgrade/Install
+          run: |
+               helm upgrade --install snackbar snackbar-charts/snackbar-app \
+               --namespace ns-snackbar \
+               --create-namespace \
+               --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
+               --set image.tag=latest
+   
+
   api_pipeline:
     if: github.event.action == 'api_commit'
     runs-on: ubuntu-latest

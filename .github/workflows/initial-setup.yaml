@@ -41,5 +41,5 @@ jobs:
           helm plugin install https://github.com/hypnoglow/helm-s3.git
           helm repo add snackbar-charts s3://fiap-9soat-snackbar
           helm package helm-chart/snackbar-app/
-          helm s3 push helm-chart/snackbar-app-0.1.0.tgz snackbar-charts
+          helm s3 push helm-chart/snackbar-app-1.0.0.tgz snackbar-charts
           

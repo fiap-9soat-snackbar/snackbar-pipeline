@@ -198,6 +198,7 @@ jobs:
         with:
           repository: 'fiap-9soat-snackbar/snackbar'
           token: ${{ secrets.GH_TOKEN}}
+          ref: 'feature/pipelines'
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -228,6 +229,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
+        ref: 'feature/pipelines'
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -244,8 +246,8 @@ jobs:
 
     - name: Run SonarCloud Analysis
       run: mvn -f backend/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
-            -Dsonar.projectKey=fiap-9soat-snackbar_snackbar\
-            -Dsonar.organization=fiap-9soat-snackbar\
+            -Dsonar.projectKey=fiap-9soat-snackbar_snackbar \
+            -Dsonar.organization=fiap-9soat-snackbar \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
@@ -259,6 +261,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
+        ref: 'feature/pipelines'
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2

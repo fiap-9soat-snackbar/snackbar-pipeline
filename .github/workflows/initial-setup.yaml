@@ -23,6 +23,8 @@ jobs:
 
   install-helm-chart:
     runs-on: ubuntu-latest
+    needs: setup-bucket
+    if: always()
 
     steps:
       - name: Checkout Kubernetes Repo

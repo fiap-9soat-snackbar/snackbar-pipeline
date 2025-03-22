@@ -5,7 +5,7 @@ on:
     types: [infra_commit, app_commit, api_commit, lambda_commit, db_commit]
 
 jobs:
-  initial-setup:
+  global-setup:
     if: github.event.action == 'infra_commit'
     runs-on: ubuntu-latest
 
@@ -27,7 +27,8 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform init
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
+        run: terraform init -backend-config="bucket=${{ env.BUCKET_S3}}"
         working-directory: terraform/us-east-1/global
 
       - name: Plan Global Setup
@@ -36,6 +37,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         run: terraform plan
         working-directory: terraform/us-east-1/global
 
@@ -45,13 +47,16 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         if: ${{ success() }}
-        run: terraform apply -auto-approve
+        run: terraform apply -backend-config="bucket=${{ env.BUCKET_S3}}" -auto-approve
         working-directory: terraform/us-east-1/global
 
   vpc-setup:
     runs-on: ubuntu-latest
-    needs: initial-setup
+    needs: global-setup
+    if: false
+
 
     steps:   
       - name: Checkout Kubernetes Repo
@@ -98,6 +103,7 @@ jobs:
   securitygroup-setup:
     runs-on: ubuntu-latest
     needs: vpc-setup
+    
 
     steps:   
       - name: Checkout Kubernetes Repo

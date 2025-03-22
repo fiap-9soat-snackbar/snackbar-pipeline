@@ -343,6 +343,11 @@ jobs:
           repository: 'fiap-9soat-snackbar/snackbar-database'
           token: ${{ secrets.GH_TOKEN}}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+
       - name: Create DB variables.tfvars
         run: |
             cat <<EOF > variables.tfvars

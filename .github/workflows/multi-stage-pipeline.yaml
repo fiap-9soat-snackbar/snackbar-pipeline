@@ -49,7 +49,7 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
             BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         if: ${{ success() }}
-        run: terraform apply -backend-config="bucket=${{ env.BUCKET_S3}}" -auto-approve
+        run: terraform apply -auto-approve
         working-directory: terraform/us-east-1/global
 
   vpc-setup:

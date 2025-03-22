@@ -358,15 +358,12 @@ jobs:
             mongodbatlas_password="${{ secrets.MONGODBATLAS_PASSWORD }}"
             MONGODB_USER="${{ secrets.MONGODB_PASSWORD }}"
             MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
-            bucket="${{ secrets.BUCKET_S3 }}"
             EOF
 
       - name: Init Dababase Setup
         run: |
             ls -lha
             cat variables.tfvars
-      
-      
 
       - name: Init Dababase Setup
         env:
@@ -374,7 +371,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform init -var-file=variables.tfvars
+        run: terraform init -var-file=variables.tfvars -var="bucket=${{ secrets.BUCKET_S3 }}"
         
       - name: Plan Dababase Setup
         env:
@@ -382,7 +379,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform plan -var-file=variables.tfvars
+        run: terraform plan -var-file=variables.tfvars -var="bucket=${{ secrets.BUCKET_S3 }}"
     
       - name: Apply Dababase Setup
         env:
@@ -391,7 +388,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform apply -var-file=variables.tfvars -auto-approve
+        run: terraform apply -var-file=variables.tfvars -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
 
   api_pipeline:
     if: github.event.action == 'api_commit'

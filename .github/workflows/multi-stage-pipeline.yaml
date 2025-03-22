@@ -27,8 +27,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
-        run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}" -backend-config="bucket=${{ secrets.BUCKET_S3}}"
+        run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/global
 
       - name: Plan Global Setup
@@ -37,7 +36,6 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-            s3_bucket_name: ${{ secrets.BUCKET_S3 }}
         run: terraform plan
         working-directory: terraform/us-east-1/global
 
@@ -73,7 +71,6 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/network/vpc
 
@@ -84,7 +81,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform plan
+        run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         working-directory: terraform/us-east-1/network/vpc
 
 
@@ -95,7 +92,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform apply -auto-approve
+        run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/network/vpc  
 
   securitygroup-setup:
@@ -120,7 +117,6 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/compute/securitygroup
 
@@ -131,7 +127,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform plan
+        run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         working-directory: terraform/us-east-1/compute/securitygroup
 
 
@@ -142,7 +138,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform apply -auto-approve
+        run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/compute/securitygroup  
         
   eks-setup:
@@ -167,7 +163,6 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/compute/eks/mithrandir
 
@@ -178,7 +173,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform plan
+        run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         working-directory: terraform/us-east-1/compute/eks/mithrandir
 
 
@@ -189,7 +184,7 @@ jobs:
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
-        run: terraform apply -auto-approve
+        run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/compute/eks/mithrandir
   
 

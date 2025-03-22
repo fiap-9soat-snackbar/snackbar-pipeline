@@ -127,6 +127,7 @@ jobs:
               AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
               AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+              BUCKET_S3: ${{ secrets.BUCKET_S3 }}
           run: |
-            aws s3 rm s3://fiap-9soat-snackbar --recursive
-            aws s3api delete-bucket --bucket fiap-9soat-snackbar --region us-east-1
+            aws s3 rm s3://${{ secrets.BUCKET_S3 }} --recursive
+            aws s3api delete-bucket --bucket ${{ secrets.BUCKET_S3 }} --region us-east-1

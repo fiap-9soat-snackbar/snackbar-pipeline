@@ -333,6 +333,18 @@ jobs:
                --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
                --set image.tag=latest
    
+  db_pipeline:
+    if: github.event.action == 'db_commit'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DB Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/snackbar-database'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Apply DB Changes
+        run: terraform init
 
   api_pipeline:
     if: github.event.action == 'api_commit'
@@ -360,15 +372,4 @@ jobs:
       - name: Deploy Lambda
         run: terraform apply -auto-approve
 
-  db_pipeline:
-    if: github.event.action == 'db_commit'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout DB Repo
-        uses: actions/checkout@v3
-        with:
-          repository: 'fiap-9soat-snackbar/db'
-          token: ${{ secrets.GH_TOKEN}}
 
-      - name: Apply DB Changes
-        run: terraform apply -auto-approve

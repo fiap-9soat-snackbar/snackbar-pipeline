@@ -18,6 +18,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         run: |
           aws s3api create-bucket --bucket ${{ secrets.BUCKET_S3 }} --region us-east-1
 
@@ -39,6 +40,7 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
         run: |
           helm plugin install https://github.com/hypnoglow/helm-s3.git
           helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }}

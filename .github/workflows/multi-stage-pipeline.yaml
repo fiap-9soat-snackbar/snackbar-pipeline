@@ -353,7 +353,7 @@ jobs:
             mongodbatlas_password="${{ secrets.MONGODB_PASSWORD }}"
             MONGODB_USER="${{ secrets.MONGODB_USER }}"
             MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
-            bucket="${{ secrets.BUCKET }}"
+            bucket="${{ secrets.BUCKET_S3 }}"
             EOF
 
       - name: Init Dababase Setup

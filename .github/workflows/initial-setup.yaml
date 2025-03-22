@@ -30,7 +30,7 @@ jobs:
       - name: Checkout Kubernetes Repo
         uses: actions/checkout@v3
         with:
-          repository: '${{ secrets.BUCKET_S3 }}/eks'
+          repository: 'fiap-9soat-snackbar/eks'
           token: ${{ secrets.GH_TOKEN}}          
           
       - name: Init Helm
@@ -41,8 +41,8 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: |
           helm plugin install https://github.com/hypnoglow/helm-s3.git
-          helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }} 
-          helm s3 init s3://${{ secrets.BUCKET_S3 }}  --ignore-if-exists
+          helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }}
+          helm s3 init s3://${{ secrets.BUCKET_S3 }} --ignore-if-exists
           helm package helm-chart/snackbar-app/
           helm s3 push snackbar-app-1.0.0.tgz snackbar-charts --force
           

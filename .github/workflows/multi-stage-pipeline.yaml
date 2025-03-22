@@ -343,8 +343,43 @@ jobs:
           repository: 'fiap-9soat-snackbar/snackbar-database'
           token: ${{ secrets.GH_TOKEN}}
 
-      - name: Apply DB Changes
-        run: terraform init
+      - name: Create DB variables.tfvars
+        run: |
+            cat <<EOF > variables.tfvars
+            org_id="${{ secrets.ORG_ID }}"
+            mongodbatlas_org_public_key="${{ secrets.MONGODB_PUBLIC_KEY }}"
+            mongodbatlas_org_private_key="${{ secrets.MONGODB_PRIVATE_KEY }}"
+            mongodbatlas_username="${{ secrets.MONGODB_USERNAME }}"
+            mongodbatlas_password="${{ secrets.MONGODB_PASSWORD }}"
+            MONGODB_USER="${{ secrets.MONGODB_USER }}"
+            MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
+            bucket="${{ secrets.BUCKET }}"
+            EOF
+
+      - name: Init Dababase Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform init -var-file=variables.tfvars
+        
+      - name: Plan Dababase Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        run: terraform plan -var-file=variables.tfvars
+    
+      - name: Apply Dababase Setup
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+        if: ${{ success() }}
+        run: terraform apply -var-file=variables.tfvars -auto-approve
 
   api_pipeline:
     if: github.event.action == 'api_commit'

@@ -352,11 +352,11 @@ jobs:
         run: |
             cat <<EOF > variables.tfvars
             org_id="${{ secrets.ORG_ID }}"
-            mongodbatlas_org_public_key="${{ secrets.MONGODB_PUBLIC_KEY }}"
-            mongodbatlas_org_private_key="${{ secrets.MONGODB_PRIVATE_KEY }}"
-            mongodbatlas_username="${{ secrets.MONGODB_USERNAME }}"
-            mongodbatlas_password="${{ secrets.MONGODB_PASSWORD }}"
-            MONGODB_USER="${{ secrets.MONGODB_USER }}"
+            mongodbatlas_org_public_key="${{ secrets.MONGODBATLAS_ORG_PUBLIC_KEY }}"
+            mongodbatlas_org_private_key="${{ secrets.MONGODBATLAS_ORG_PRIVATE_KEY }}"
+            mongodbatlas_username="${{ secrets.MONGODBATLAS_USERNAME }}"
+            mongodbatlas_password="${{ secrets.MONGODBATLAS_PASSWORD }}"
+            MONGODB_USER="${{ secrets.MONGODB_PASSWORD }}"
             MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
             bucket="${{ secrets.BUCKET_S3 }}"
             EOF

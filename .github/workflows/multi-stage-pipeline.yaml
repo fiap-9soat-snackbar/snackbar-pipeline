@@ -417,7 +417,7 @@ jobs:
       - name: Get MongoDB connection string from Terraform
         id: get_conn_string
         run: |
-          MONGO_CONNECTION_STRING=$(terraform output -raw connection_string 2>/dev/null || echo "")
+          MONGO_CONNECTION_STRING=$(terraform output -raw connection_string | tr -d '\r\n')
           echo "MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING" >> $GITHUB_ENV
 
       - name: Insert data into MongoDB - produtcts

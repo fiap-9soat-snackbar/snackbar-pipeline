@@ -401,6 +401,41 @@ jobs:
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install MongoDB tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mongodb-clients
+
+      - name: Get MongoDB connection string from Terraform
+        id: get_conn_string
+        run: |
+          echo "MONGO_CONNECTION_STRING=$(terraform output -raw connection_string)" >> $GITHUB_ENV
+
+      - name: Insert data into MongoDB - produtcts
+        env:
+          MONGO_CONNECTION_STRING: ${{ env.MONGO_CONNECTION_STRING }}
+          MONGO_USER: ${{ secrets.mongodbatlas_username }}
+          MONGO_PASSWORD: ${{ secrets.mongodbatlas_password }}
+        run: |
+          mongo "${MONGO_CONNECTION_STRING}" --username $MONGO_USER --password $MONGO_PASSWORD 02-products-restore.js
+
+      - name: Insert data into MongoDB - orders
+        env:
+          MONGO_CONNECTION_STRING: ${{ env.MONGO_CONNECTION_STRING }}
+          MONGO_USER: ${{ secrets.mongodbatlas_username }}
+          MONGO_PASSWORD: ${{ secrets.mongodbatlas_password }}
+        run: |
+          mongo "${MONGO_CONNECTION_STRING}" --username $MONGO_USER --password $MONGO_PASSWORD 03-orders-restore.js
+
+
+
+
+
   api_pipeline:
     if: github.event.action == 'api_commit'
     runs-on: ubuntu-latest

@@ -417,8 +417,9 @@ jobs:
           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
           MONGODBATLAS_USERNAME: ${{ secrets.MONGODBATLAS_USERNAME }}
           MONGODBATLAS_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
-          MONGO_HOST: ${{ env.MONGO_HOST }}
         run: |
+          MONGO_HOST=$(cat mongo_host.txt)
+          echo "Using MongoDB host: $MONGO_HOST"
           EXISTS_PRODUCTS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('products').exists()" --quiet)
           EXISTS_ORDERS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME  --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('orders').exists()" --quiet)
 

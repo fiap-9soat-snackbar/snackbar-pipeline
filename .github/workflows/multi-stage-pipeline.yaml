@@ -406,7 +406,6 @@ jobs:
         run: |
           connection_string=$(terraform output -raw connection_string | tr -d '\n')
           echo "$connection_string"
-          host=$(echo "$connection_string" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|')
           echo "MONGO_HOST=$host" >> $GITHUB_ENV
 
       - name: Use MongoDB Atlas host

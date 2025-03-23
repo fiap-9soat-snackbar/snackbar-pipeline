@@ -352,7 +352,7 @@ jobs:
             --digest \
             --include \
             --header "Content-Type: application/json" \
-            --request POST "https://cloud.mongodb.com/api/atlas/v1.0/groups/67df17b5db3c4a36509966e6/accessList" \
+            --request POST "https://cloud.mongodb.com/api/atlas/v1.0/groups/org_id=67df178da75a0f660e5ad214/accessList" \
             --data "{\"cidrBlock\": \"${{ env.IP }}/32\", \"comment\": \"GitHub Actions Runner\"}"
 
       - name: Setup Terraform

@@ -236,7 +236,7 @@ jobs:
         if [[ "${{ github.event.client_payload.branch }}" == "main" ]]; then
           echo "IMAGE_TAG=latest" >> $GITHUB_ENV
         elif [[ "${{ github.event.client_payload.branch }}" != "main" ]]; then
-          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
         fi
         
     - name: Set Docker repo Snackbar
@@ -272,14 +272,26 @@ jobs:
           run: |
                helm plugin install https://github.com/hypnoglow/helm-s3.git
                helm repo add snackbar-charts s3://fiap-9soat-snackbar
+
+        - name: Set helm env
+          run: |
+            if [[ "${{ github.event.client_payload.branch }}" == "main" ]]; then
+              echo "IMAGE_HELM=latest" >> $GITHUB_ENV
+              echo "APP_NAME=snackbar-homolog" >> $GITHUB_ENV
+              echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
+            elif [[ "${{ github.event.client_payload.branch }}" != "main" ]]; then
+              echo "IMAGE_HELM=homolog" >> $GITHUB_ENV
+              echo "APP_NAME=snackbar-prod" >> $GITHUB_ENV
+              echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV
+            fi
    
         - name: Helm Upgrade/Install
           run: |
-               helm upgrade --install snackbar snackbar-charts/snackbar-app \
-               --namespace ns-snackbar \
+               helm upgrade --install {{ env.APP_NAMES }} snackbar-charts/snackbar-app \
+               --namespace {{ env.APP_NAMESPACE }} \
                --create-namespace \
                --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
-               --set image.tag=latest
+               --set image.tag={{ env.IMAGE_HELM }}
 
   database-setup:
     if: github.event.action == 'db_commit'
@@ -348,7 +360,7 @@ jobs:
   lambda_pipeline:
     if: github.event.action == 'lambda_commit'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Lambda Repo
         uses: actions/checkout@v3

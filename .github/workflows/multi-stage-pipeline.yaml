@@ -397,26 +397,23 @@ jobs:
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
   
-      - name: Get MongoDB Atlas connection string
-        id: mongo_connection
+      - name: Set MongoDB Atlas host as environment variable
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: echo "::set-output name=connection_string::$(terraform output -raw connection_string)"
-
-
-      - name: Extract MongoDB Atlas host
-        id: extract_host
         run: |
-          connection_string="${{ steps.mongo_connection.outputs.connection_string }}"
+          connection_string=$(terraform output -raw connection_string)
           host=$(echo "$connection_string" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|')
-          echo "::set-output name=mongo_host::$host"
           echo "MONGO_HOST=$host" >> $GITHUB_ENV
-          printenv
+
+      - name: Use MongoDB Atlas host
+        run: |
+          echo "The MongoDB Atlas host is $MONGO_HOST"
 
       - name: Run MongoDB Scripts
+        if: false
         env:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}
           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}

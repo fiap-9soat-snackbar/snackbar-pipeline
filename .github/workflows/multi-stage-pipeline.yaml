@@ -406,9 +406,10 @@ jobs:
         run: |
           terraform output -raw connection_string > connection_string.txt
           cat connection_string.txt
-          MONGO_HOST=$(cat connection_string.txt)
-          echo "MONGO_HOST=$MONGO_HOST" >> $GITHUB_ENV
-          echo "The MongoDB Atlas host is $MONGO_HOST"
+          
+         # MONGO_HOST=$(cat connection_string.txt)
+         # echo "MONGO_HOST=$MONGO_HOST" >> $GITHUB_ENV
+         # echo "The MongoDB Atlas host is $MONGO_HOST"
 
       - name: Run MongoDB Scripts
         env:

@@ -417,7 +417,8 @@ jobs:
       - name: Get MongoDB connection string from Terraform
         id: get_conn_string
         run: |
-          echo "MONGO_CONNECTION_STRING=$(terraform output -raw connection_string)" >> $GITHUB_ENV
+          MONGO_CONNECTION_STRING=$(terraform output -raw connection_string 2>/dev/null || echo "")
+          echo "MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING" >> $GITHUB_ENV
 
       - name: Insert data into MongoDB - produtcts
         env:
@@ -426,7 +427,7 @@ jobs:
           MONGO_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
         run: |
           mongo "${MONGO_CONNECTION_STRING}" --username $MONGO_USER --password $MONGO_PASSWORD 02-products-restore.js
-
+          
       - name: Insert data into MongoDB - orders
         env:
           MONGO_CONNECTION_STRING: ${{ env.MONGO_CONNECTION_STRING }}

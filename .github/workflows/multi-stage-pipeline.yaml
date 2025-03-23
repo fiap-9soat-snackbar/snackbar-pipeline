@@ -371,11 +371,6 @@ jobs:
             EOF
 
       - name: Init Dababase Setup
-        run: |
-            ls -lha
-            cat variables.auto.tfvars
-
-      - name: Init Dababase Setup
         env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -400,44 +395,6 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        if: ${{ success() }}
-        with:
-          node-version: '16'
-
-      - name: Install MongoDB tools
-        run: |
-            wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-            sudo apt-get update
-            sudo apt-get install -y mongodb-org-shell
-
-      - name: Get MongoDB connection string from Terraform
-        id: get_conn_string
-        run: |
-          MONGO_CONNECTION_STRING=$(terraform output -raw connection_string | tr -d '\r\n')
-          echo "MONGO_CONNECTION_STRING=$MONGO_CONNECTION_STRING" >> $GITHUB_ENV
-
-      - name: Insert data into MongoDB - produtcts
-        env:
-          MONGO_CONNECTION_STRING: ${{ env.MONGO_CONNECTION_STRING }}
-          MONGO_USER: ${{ secrets.MONGODBATLAS_USERNAME }}
-          MONGO_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
-        run: |
-          mongo "${MONGO_CONNECTION_STRING}" --username $MONGO_USER --password $MONGO_PASSWORD 02-products-restore.js
-          
-      - name: Insert data into MongoDB - orders
-        env:
-          MONGO_CONNECTION_STRING: ${{ env.MONGO_CONNECTION_STRING }}
-          MONGO_USER: ${{ secrets.MONGODBATLAS_USERNAME }}
-          MONGO_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
-        run: |
-          mongo "${MONGO_CONNECTION_STRING}" --username $MONGO_USER --password $MONGO_PASSWORD 03-orders-restore.js
-
-
-
 
 
   api_pipeline:

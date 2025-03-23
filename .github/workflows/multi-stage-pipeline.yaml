@@ -284,7 +284,7 @@ jobs:
       - name: Init Helm
         run: |
               helm plugin install https://github.com/hypnoglow/helm-s3.git
-              helm repo add snackbar-charts s3://fiap-9soat-snackbar
+              helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }}
 
       - name: Set helm env
         run: |

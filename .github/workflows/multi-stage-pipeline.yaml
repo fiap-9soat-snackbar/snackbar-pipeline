@@ -414,6 +414,7 @@ jobs:
           host=$(echo "$connection_string" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|')
           echo "::set-output name=mongo_host::$host"
           echo "MONGO_HOST=$host" >> $GITHUB_ENV
+          echo "${env.MONGO_HOST}"
 
 
       - name: Run MongoDB Scripts

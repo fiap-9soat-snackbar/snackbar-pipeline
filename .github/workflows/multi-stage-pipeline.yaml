@@ -370,7 +370,6 @@ jobs:
             mongodbatlas_password="${{ secrets.MONGODBATLAS_PASSWORD }}"
             MONGODB_USER="${{ secrets.MONGODB_USER }}"
             MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
-            org_id="${{ secrets.ORG_ID }}"
             EOF
 
       - name: Init Dababase Setup

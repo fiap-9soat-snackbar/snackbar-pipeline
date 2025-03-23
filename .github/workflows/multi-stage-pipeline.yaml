@@ -397,6 +397,15 @@ jobs:
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
 
+      - name: Get MongoDB Atlas connection string
+        id: mongo_connection
+        run: echo "::set-output name=connection_string::$(terraform output -raw connection_string)"
+
+      - name: Use MongoDB Atlas connection string
+        run: |
+          echo "MONGO_CONNECTION_STRING=${{ steps.mongo_connection.outputs.connection_string }}" >> $GITHUB_ENV
+          echo "The MongoDB Atlas host is ${{ env.MONGO_CONNECTION_STRING}}"
+
       - name: Run MongoDB Scripts
         env:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}
@@ -420,10 +429,6 @@ jobs:
           else
             echo "Collection 'orders' already exists."
           fi
-        #run: |
-        #  mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
-        #  mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
-
 
   api_pipeline:
     if: github.event.action == 'api_commit'

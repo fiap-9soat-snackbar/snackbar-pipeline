@@ -300,7 +300,7 @@ jobs:
   
       - name: Helm Upgrade/Install
         run: |
-              helm upgrade --install ${{ env.APP_NAMES }} snackbar-charts/snackbar-app \
+              helm upgrade --install ${{ env.APP_NAME }} snackbar-charts/snackbar-app \
               --namespace ${{ env.APP_NAMESPACE }} \
               --create-namespace \
               --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \

@@ -348,7 +348,7 @@ jobs:
 
       - name: Add runner IP to MongoDB Atlas access list
         run: |
-            curl -u "tkqcjyge:728cce74-3334-4e26-83a4-bf162e629a6d" \
+            curl -u "ndhxcggf:cddac17e-8766-464d-8972-02843dee009f" \
             --digest \
             --include \
             --header "Content-Type: application/json" \

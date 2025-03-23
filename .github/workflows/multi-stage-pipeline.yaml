@@ -356,15 +356,23 @@ jobs:
             IP=$(curl -s ifconfig.me)
             echo "O IP do runner é: $IP"
 
-      - name: Preparando terraform 
-        run: |
-              echo "instalando terraform..."
-              sleep 30
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.3.6
+
+      - name: Install MongoDB Shell
+        run: |
+          sudo apt-get update
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt-get update
+          sudo apt-get install -y mongodb-org-shell
+
+      - name: Preparando setup 
+        run: |
+              echo "configurando variáveis de ambiente"
+              sleep 30
 
       - name: Create DB variables.auto.tfvars
         run: |
@@ -403,6 +411,14 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
+
+      - name: Run MongoDB Scripts
+        env:
+          MONGODB_USER: ${{ secrets.MONGODB_USER }}
+          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+        run: |
+          mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
+          mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
 
 
   api_pipeline:

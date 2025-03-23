@@ -408,7 +408,7 @@ jobs:
           terraform output -raw connection_string > connection_string.txt
           sed 's/::.*//' connection_string.txt > host.txt
           MONGO_HOST=$(cat host.txt)
-          echo "MONGO_HOST=$MONGO_HOST" >> $GITHUB_ENV
+          printf "MONGO_HOST=%s\n" "$MONGO_HOST" >> $GITHUB_ENV
           echo "The MongoDB Atlas host is $MONGO_HOST"
           
 

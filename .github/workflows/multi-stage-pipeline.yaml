@@ -413,13 +413,12 @@ jobs:
           echo "The MongoDB Atlas host is $MONGO_HOST"
 
       - name: Run MongoDB Scripts
-        if: false
         env:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}
           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
           MONGODBATLAS_USERNAME: ${{ secrets.MONGODBATLAS_USERNAME }}
           MONGODBATLAS_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
-          MONGO_HOST: ${{ steps.extract_host.outputs.mongo_host }}
+          MONGO_HOST: ${{ env.MONGO_HOST }}
         run: |
           EXISTS_PRODUCTS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('products').exists()" --quiet)
           EXISTS_ORDERS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME  --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('orders').exists()" --quiet)

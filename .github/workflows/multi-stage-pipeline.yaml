@@ -363,12 +363,14 @@ jobs:
         run: |
             cat <<EOF > variables.auto.tfvars
             org_id="${{ secrets.ORG_ID }}"
+            aws_nat_gateway="${{ secrets.AWS_NAT_GATEWAY }}"
             mongodbatlas_org_public_key="${{ secrets.MONGODBATLAS_ORG_PUBLIC_KEY }}"
             mongodbatlas_org_private_key="${{ secrets.MONGODBATLAS_ORG_PRIVATE_KEY }}"
             mongodbatlas_username="${{ secrets.MONGODBATLAS_USERNAME }}"
             mongodbatlas_password="${{ secrets.MONGODBATLAS_PASSWORD }}"
             MONGODB_USER="${{ secrets.MONGODB_USER }}"
             MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
+            org_id="${{ secrets.ORG_ID }}"
             EOF
 
       - name: Init Dababase Setup

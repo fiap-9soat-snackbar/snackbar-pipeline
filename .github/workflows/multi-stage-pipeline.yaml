@@ -290,21 +290,21 @@ jobs:
         run: |
           if [[ "${{ github.event.client_payload.branch }}" == "main" ]]; then
             echo "IMAGE_HELM=latest" >> $GITHUB_ENV
-            echo "APP_NAME=snackbar-homolog" >> $GITHUB_ENV
+            echo "APP_NAME=snackbar-prod" >> $GITHUB_ENV
             echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
           elif [[ "${{ github.event.client_payload.branch }}" != "main" ]]; then
             echo "IMAGE_HELM=homolog" >> $GITHUB_ENV
-            echo "APP_NAME=snackbar-prod" >> $GITHUB_ENV
+            echo "APP_NAME=snackbar-homolog" >> $GITHUB_ENV
             echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV
           fi
   
       - name: Helm Upgrade/Install
         run: |
-              helm upgrade --install {{ env.APP_NAMES }} snackbar-charts/snackbar-app \
-              --namespace {{ env.APP_NAMESPACE }} \
+              helm upgrade --install ${{ env.APP_NAMES }} snackbar-charts/snackbar-app \
+              --namespace ${{ env.APP_NAMESPACE }} \
               --create-namespace \
               --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
-              --set image.tag={{ env.IMAGE_HELM }}
+              --set image.tag=${{ env.IMAGE_HELM }}
 
   database-setup:
     if: github.event.action == 'db_commit'

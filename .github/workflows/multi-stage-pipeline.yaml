@@ -398,30 +398,30 @@ jobs:
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
   
-      - name: Run MongoDB Scripts
-        env:
-          MONGODB_USER: ${{ secrets.MONGODB_USER }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          MONGODBATLAS_USERNAME: ${{ secrets.MONGODBATLAS_USERNAME }}
-          MONGODBATLAS_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
-          MONGO_HOST: ${{ secrets.MONGO_HOST}}
-        run: |
-          EXISTS_PRODUCTS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('products').exists()" --quiet)
-          EXISTS_ORDERS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME  --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('orders').exists()" --quiet)
-
-          if [ "$EXISTS_PRODUCTS" = "null" ]; then
-            echo "Collection 'products' does not exist. Running 02-products-restore.js"
-            mongosh "$MONGO_HOST" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
-          else
-            echo "Collection 'products' already exists."
-          fi
-
-          if [ "$EXISTS_ORDERS" = "null" ]; then
-            echo "Collection 'orders' does not exist. Running 03-orders-restore.js"
-            mongosh "$MONGO_HOST" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
-          else
-            echo "Collection 'orders' already exists."
-          fi
+   #   - name: Run MongoDB Scripts
+   #     env:
+   #       MONGODB_USER: ${{ secrets.MONGODB_USER }}
+   #       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+   #       MONGODBATLAS_USERNAME: ${{ secrets.MONGODBATLAS_USERNAME }}
+   #       MONGODBATLAS_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
+   #       MONGO_HOST: ${{ secrets.MONGO_HOST}}
+   #     run: |
+   #       EXISTS_PRODUCTS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('products').exists()" --quiet)
+   #       EXISTS_ORDERS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME  --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('orders').exists()" --quiet)
+#
+   #       if [ "$EXISTS_PRODUCTS" = "null" ]; then
+   #         echo "Collection 'products' does not exist. Running 02-products-restore.js"
+   #         mongosh "$MONGO_HOST" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
+   #       else
+   #         echo "Collection 'products' already exists."
+   #       fi
+#
+   #       if [ "$EXISTS_ORDERS" = "null" ]; then
+   #         echo "Collection 'orders' does not exist. Running 03-orders-restore.js"
+   #         mongosh "$MONGO_HOST" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
+   #       else
+   #         echo "Collection 'orders' already exists."
+   #       fi
 
   api_pipeline:
     if: github.event.action == 'api_commit'

@@ -396,15 +396,11 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
-
-      - name: Get MongoDB Atlas connection string
-        id: mongo_connection
-        run: echo "::set-output name=connection_string::$(terraform output -raw connection_string)"
-
-      - name: Use MongoDB Atlas connection string
-        run: |
-          echo "MONGO_CONNECTION_STRING=${{ steps.mongo_connection.outputs.connection_string }}" >> $GITHUB_ENV
-          echo "The MongoDB Atlas host is ${{ env.MONGO_CONNECTION_STRING}}"
+             MONGO_CONNECTION_STRING=$(terraform output -raw connection_string) >> $GITHUB_ENV
+             MONGO_HOST=$(echo "$MONGO_CONNECTION_STRING" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|') >> $GITHUB_ENV
+             echo ${{ env.MONGO_CONNECTION_STRING }}
+             echo ${{ env.MONGO_HOST }}
+             
 
       - name: Run MongoDB Scripts
         env:

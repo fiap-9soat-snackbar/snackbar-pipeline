@@ -408,12 +408,10 @@ jobs:
           terraform output -raw connection_string > connection_string.txt
           sed 's/::.*//' connection_string.txt > host.txt
           MONGO_HOST=$(cat host.txt)
-          printf "MONGO_HOST=%s\n" "$MONGO_HOST" >> $GITHUB_ENV
           echo "The MongoDB Atlas host is $MONGO_HOST"
           
 
       - name: Run MongoDB Scripts
-        if: false
         env:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}
           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}

@@ -403,14 +403,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: |
-          host=$(terraform output -raw connection_string | tr -d '\n')
-          echo "$host"
-          echo "MONGO_HOST=$host" >> $GITHUB_ENV
-
-      - name: Use MongoDB Atlas host
-        run: |
-          echo "The MongoDB Atlas host is $MONGO_HOST"
+        run: terraform output -raw connection_string > connection_string.txt
+             cat connection_string.txt
+             MONGO_HOST=$(cat connection_string.txt)
+             echo "MONGO_HOST=$MONGO_HOST" >> $GITHUB_ENV
+             echo "The MongoDB Atlas host is $MONGO_HOST"
 
       - name: Run MongoDB Scripts
         env:

@@ -16,6 +16,12 @@ jobs:
           repository: 'fiap-9soat-snackbar/snackbar-database'
           token: ${{ secrets.GH_TOKEN}}
 
+      - name: Obter o IP do runner
+        run: |
+              IP=$(curl -s ifconfig.me)
+              echo "O IP do runner é: $IP"
+              sleep 30
+
       - name: Run MongoDB Restore Script
         env:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}

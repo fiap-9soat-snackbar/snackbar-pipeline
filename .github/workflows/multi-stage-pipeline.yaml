@@ -404,8 +404,8 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: |
-          connection_string=$(terraform output -raw connection_string | tr -d '\n')
-          echo "$connection_string"
+          host=$(terraform output -raw connection_string | tr -d '\n')
+          echo "$host"
           echo "MONGO_HOST=$host" >> $GITHUB_ENV
 
       - name: Use MongoDB Atlas host

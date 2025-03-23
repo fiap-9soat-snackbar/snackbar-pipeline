@@ -333,7 +333,7 @@ jobs:
                --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
                --set image.tag=latest
    
-  db_pipeline:
+  database-setup:
     if: github.event.action == 'db_commit'
     runs-on: ubuntu-latest
     steps:

@@ -396,7 +396,6 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
-             connection_string=$(terraform output -raw connection_string)
   
       - name: Get MongoDB Atlas connection string
         id: mongo_connection

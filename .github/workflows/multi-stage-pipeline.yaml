@@ -8,6 +8,11 @@ jobs:
   global-setup:
     if: github.event.action == 'infra_commit'
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
     steps:
       - name: Checkout Kubernetes Repo
@@ -22,29 +27,14 @@ jobs:
           terraform_version: 1.0.0
 
       - name: Init Global Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/global
 
       - name: Plan Global Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan
         working-directory: terraform/us-east-1/global
 
       - name: Apply Global Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -auto-approve
         working-directory: terraform/us-east-1/global
@@ -66,37 +56,25 @@ jobs:
           terraform_version: 1.0.0
   
       - name: Init VPC Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/network/vpc
 
-    
       - name: Plan VPC Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         working-directory: terraform/us-east-1/network/vpc
 
-
       - name: Apply VPC Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/network/vpc  
 
   securitygroup-setup:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     needs: vpc-setup
     
     steps:   
@@ -112,37 +90,25 @@ jobs:
           terraform_version: 1.0.0
   
       - name: Init Security Group Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/compute/securitygroup
 
-    
       - name: Plan Security Group Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         working-directory: terraform/us-east-1/compute/securitygroup
 
-
       - name: Apply Security Group Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/compute/securitygroup  
         
   eks-setup:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     needs: securitygroup-setup
 
     steps:   
@@ -158,36 +124,18 @@ jobs:
           terraform_version: 1.0.0
   
       - name: Init EKS Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3}}"
         working-directory: terraform/us-east-1/compute/eks/mithrandir
 
-    
       - name: Plan EKS Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         working-directory: terraform/us-east-1/compute/eks/mithrandir
 
-
       - name: Apply EKS Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/compute/eks/mithrandir
   
-
   unit-tests:
     if: github.event.action == 'app_commit'
     runs-on: ubuntu-latest
@@ -215,9 +163,6 @@ jobs:
 
       - name: Build with Maven
         run: mvn -f backend/pom.xml clean install --no-transfer-progress
-
-      - name: Build with Maven
-        run: mvn -f backend/pom.xml package
       
       - name: Run unit tests
         run: mvn -f backend/pom.xml test --no-transfer-progress
@@ -274,6 +219,9 @@ jobs:
         token: ${{ secrets.GH_TOKEN}}
         ref: 'feature/pipelines'
 
+    - name: Build with Maven
+      run: mvn -f backend/pom.xml package
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
@@ -305,6 +253,11 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     needs: [build-and-push]
 
     steps:
@@ -313,36 +266,21 @@ jobs:
                curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
    
         - name: Configure kubectl for EKS
-          env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           run: aws eks update-kubeconfig --name snackbar-mithrandir --region ${{ secrets.AWS_DEFAULT_REGION }}
    
         - name: Init Helm
-          env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           run: |
                helm plugin install https://github.com/hypnoglow/helm-s3.git
                helm repo add snackbar-charts s3://fiap-9soat-snackbar
    
         - name: Helm Upgrade/Install
-          env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           run: |
                helm upgrade --install snackbar snackbar-charts/snackbar-app \
                --namespace ns-snackbar \
                --create-namespace \
                --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
                --set image.tag=latest
-   
+
   database-setup:
     if: github.event.action == 'db_commit'
     runs-on: ubuntu-latest
@@ -358,7 +296,6 @@ jobs:
           repository: 'fiap-9soat-snackbar/snackbar-database'
           token: ${{ secrets.GH_TOKEN}}
               
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -397,6 +334,7 @@ jobs:
   api_pipeline:
     if: github.event.action == 'api_commit'
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout API Gateway Repo
         uses: actions/checkout@v3
@@ -410,6 +348,7 @@ jobs:
   lambda_pipeline:
     if: github.event.action == 'lambda_commit'
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout Lambda Repo
         uses: actions/checkout@v3

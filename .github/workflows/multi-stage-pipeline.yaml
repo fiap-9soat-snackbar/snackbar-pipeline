@@ -397,8 +397,19 @@ jobs:
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
              connection_string=$(terraform output -raw connection_string)
-             echo "MONGO_CONNECTION_STRING=$connection_string" >> $GITHUB_ENV
-             echo "$MONGO_CONNECTION_STRING"
+  
+      - name: Get MongoDB Atlas connection string
+        id: mongo_connection
+        run: echo "::set-output name=connection_string::$(terraform output -raw connection_string)"
+
+
+      - name: Extract MongoDB Atlas host
+        id: extract_host
+        run: |
+          connection_string="${{ steps.mongo_connection.outputs.connection_string }}"
+          host=$(echo "$connection_string" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|')
+          echo "::set-output name=mongo_host::$host"
+          echo "MONGO_HOST=$host" >> $GITHUB_ENV
 
 
       - name: Run MongoDB Scripts

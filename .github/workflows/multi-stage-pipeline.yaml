@@ -404,7 +404,8 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: |
-          connection_string=$(terraform output -raw | tr -d '\n')
+          connection_string=$(terraform output -raw connection_string | tr -d '\n')
+          echo "$connection_string"
           host=$(echo "$connection_string" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|')
           echo "MONGO_HOST=$host" >> $GITHUB_ENV
 

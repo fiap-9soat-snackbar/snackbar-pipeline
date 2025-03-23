@@ -401,9 +401,11 @@ jobs:
         env:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}
           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          MONGODBATLAS_USERNAME: ${{ secrets.MONGODBATLAS_USERNAME }}
+          MONGODBATLAS_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
         run: |
-              EXISTS_PRODUCTS=$(mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net/products" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "db.getCollectionNames().indexOf('products') >= 0" --quiet)
-              EXISTS_ORDERS=$(mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net/orders" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "db.getCollectionNames().indexOf('orders') >= 0" --quiet)
+              EXISTS_PRODUCTS=$(mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net/products" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getCollectionNames().indexOf('products') >= 0" --quiet)
+              EXISTS_ORDERS=$(mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net/orders" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getCollectionNames().indexOf('orders') >= 0" --quiet)
 
               if [ "$EXISTS_PRODUCTS" = "false" ]; then
                 echo "Running 02-products-restore.js"

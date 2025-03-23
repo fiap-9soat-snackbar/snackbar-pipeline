@@ -396,11 +396,13 @@ jobs:
             AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
-             MONGO_CONNECTION_STRING=$(terraform output -raw connection_string) >> $GITHUB_ENV
-             MONGO_HOST=$(echo "$MONGO_CONNECTION_STRING" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|') >> $GITHUB_ENV
-             echo ${{ env.MONGO_CONNECTION_STRING }}
-             echo ${{ env.MONGO_HOST }}
-             
+             connection_string=$(terraform output -raw connection_string)
+             echo "MONGO_CONNECTION_STRING=$connection_string" >> $GITHUB_ENV
+             mongo_host=$(echo "$connection_string" | sed 's|mongodb+srv://\([^/]*\)/.*|\1|')
+             echo "MONGO_HOST=$mongo_host" >> $GITHUB_ENV
+             echo "$MONGO_CONNECTION_STRING"
+             echo "$MONGO_HOST"
+
 
       - name: Run MongoDB Scripts
         env:

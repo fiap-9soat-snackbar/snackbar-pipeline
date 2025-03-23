@@ -343,17 +343,15 @@ jobs:
           repository: 'fiap-9soat-snackbar/snackbar-database'
           token: ${{ secrets.GH_TOKEN}}
 
-      - name: Get current runner IP
-        run: echo "IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
-
-      - name: Add runner IP to MongoDB Atlas access list
+      - name: Obter o IP do runner
         run: |
-            curl -u "ndhxcggf:cddac17e-8766-464d-8972-02843dee009f" \
-            --digest \
-            --include \
-            --header "Content-Type: application/json" \
-            --request POST "https://cloud.mongodb.com/api/atlas/v1.0/groups/org_id=67df178da75a0f660e5ad214/accessList" \
-            --data "{\"cidrBlock\": \"${{ env.IP }}/32\", \"comment\": \"GitHub Actions Runner\"}"
+            IP=$(curl -s ifconfig.me)
+            echo "O IP do runner é: $IP"
+
+      - name: Preparando terraform 
+        run: |
+              echo "instalando terraform..."
+              sleep 30
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2

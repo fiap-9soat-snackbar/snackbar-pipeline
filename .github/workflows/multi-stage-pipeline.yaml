@@ -215,6 +215,9 @@ jobs:
 
       - name: Build with Maven
         run: mvn -f backend/pom.xml clean install --no-transfer-progress
+
+      - name: Build with Maven
+        run: mvn -f backend/pom.xml package
       
       - name: Run unit tests
         run: mvn -f backend/pom.xml test --no-transfer-progress
@@ -254,6 +257,13 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      MONGODB_USER: ${{ secrets.MONGODB_USER }}
+      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      DB_HOST: ${{ secrets.MONGO_HOST }}
+      APP_DB: ${{ secrets.MONGO_APP_DB }}
+      JWT_EXPIRES: ${{ secrets.JWT_EXPIRES }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     needs: [unit-tests, code-analysis]
 
     steps:
@@ -278,7 +288,7 @@ jobs:
         if [[ "${{ github.event.client_payload.branch }}" == "main" ]]; then
           echo "IMAGE_TAG=latest" >> $GITHUB_ENV
         elif [[ "${{ github.event.client_payload.branch }}" != "main" ]]; then
-          echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
+          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
         fi
         
     - name: Set Docker repo Snackbar
@@ -336,6 +346,11 @@ jobs:
   database-setup:
     if: github.event.action == 'db_commit'
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     steps:
       - name: Checkout DB Repo
         uses: actions/checkout@v3
@@ -355,9 +370,6 @@ jobs:
               echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
               sudo apt-get update
               sudo apt-get install -y mongodb-mongosh
-              IP=$(curl -s ifconfig.me)
-              echo "O IP do runner é: $IP"
-              sleep 10
 
       - name: Create DB variables.auto.tfvars
         run: |
@@ -373,56 +385,15 @@ jobs:
             EOF
 
       - name: Init Dababase Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
-
-        
+ 
       - name: Plan Dababase Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
     
       - name: Apply Dababase Setup
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
   
-   #   - name: Run MongoDB Scripts
-   #     env:
-   #       MONGODB_USER: ${{ secrets.MONGODB_USER }}
-   #       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-   #       MONGODBATLAS_USERNAME: ${{ secrets.MONGODBATLAS_USERNAME }}
-   #       MONGODBATLAS_PASSWORD: ${{ secrets.MONGODBATLAS_PASSWORD }}
-   #       MONGO_HOST: ${{ secrets.MONGO_HOST}}
-   #     run: |
-   #       EXISTS_PRODUCTS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('products').exists()" --quiet)
-   #       EXISTS_ORDERS=$(mongosh "$MONGO_HOST" --username $MONGODBATLAS_USERNAME  --password $MONGODBATLAS_PASSWORD --eval "db.getSiblingDB('snackbar').getCollection('orders').exists()" --quiet)
-#
-   #       if [ "$EXISTS_PRODUCTS" = "null" ]; then
-   #         echo "Collection 'products' does not exist. Running 02-products-restore.js"
-   #         mongosh "$MONGO_HOST" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
-   #       else
-   #         echo "Collection 'products' already exists."
-   #       fi
-#
-   #       if [ "$EXISTS_ORDERS" = "null" ]; then
-   #         echo "Collection 'orders' does not exist. Running 03-orders-restore.js"
-   #         mongosh "$MONGO_HOST" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
-   #       else
-   #         echo "Collection 'orders' already exists."
-   #       fi
-
   api_pipeline:
     if: github.event.action == 'api_commit'
     runs-on: ubuntu-latest

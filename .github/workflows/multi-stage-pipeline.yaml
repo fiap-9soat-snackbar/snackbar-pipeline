@@ -402,8 +402,25 @@ jobs:
           MONGODB_USER: ${{ secrets.MONGODB_USER }}
           MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
         run: |
-          mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
-          mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
+              EXISTS_PRODUCTS=$(mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net/products" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "db.getCollectionNames().indexOf('products') >= 0" --quiet)
+              EXISTS_ORDERS=$(mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net/orders" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "db.getCollectionNames().indexOf('orders') >= 0" --quiet)
+
+              if [ "$EXISTS_PRODUCTS" = "false" ]; then
+                echo "Running 02-products-restore.js"
+                mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
+              else
+                echo "Collection 'products' already exists."
+              fi
+
+              if [ "$EXISTS_ORDERS" = "false" ]; then
+                echo "Running 03-orders-restore.js"
+                mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
+              else
+                echo "Collection 'orders' already exists."
+              fi
+        #run: |
+        #  mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('02-products-restore.js')"
+        #  mongosh "mongodb+srv://snackbar-tcfase03-dev.0acxv.mongodb.net" --username $MONGODB_USER --password $MONGODB_PASSWORD --eval "load('03-orders-restore.js')"
 
 
   api_pipeline:

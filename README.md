@@ -1,74 +1,72 @@
-# snackbar-pipeline
----
-
 # CI/CD Pipeline
 
-Este repositório contém a configuração de pipeline de CI/CD responsável por automatizar o processo de build, testes, e deploy de nossa aplicação Snackbar. A pipeline foi configurada para garantir que a aplicação seja testada corretamente e implantada de forma eficiente usando infraestrura Cloud AWS e Atlas MongoDB.
+This repository contains the CI/CD pipeline configuration responsible for automating the build, test, and deploy processes of our Snackbar application. The pipeline has been configured to ensure the application is correctly tested and efficiently deployed using AWS Cloud and MongoDB Atlas infrastructure.
 
-## Propósito
+## Purpose
 
-O principal objetivo desta pipeline é automatizar as seguintes etapas:
-- **Build**: Criação de builds consistentes para garantir que a aplicação esteja pronta para execução.
-- **Testes**: Execução de testes unitários pata validar funcionalidade do código.
-- **Deploy**: Implantação automática da aplicação em ambiente cloud, usando ferramentas como Terraform, Helm e Kubernetes.
+The main objective of this pipeline is to automate the following steps:
 
+- **Build**: Create consistent builds to ensure the application is ready for execution.
+- **Tests**: Run unit tests to validate the functionality of the code.
+- **Deploy**: Automatically deploy the application to a cloud environment using tools like Terraform, Helm, and Kubernetes.
 
-## Funcionalidades
+## Features
 
-- **Construção da aplicação**: Gera a versão mais recente da aplicação.
-- **Execução de testes**: Garante que as funcionalidades estão funcionando corretamente antes do deploy.
-- **Deploy automatizado**: Implanta a aplicação no ambiente cloud.
-- **Provisionamento de Infraestrutura automatizado**: Implanta a infraestrutura necessária para que a aplicacão funcione, como Kubernetes, Api Gateway, Lambda Functions e MongoDB. 
+- **Application Build**: Generates the latest version of the application.
+- **Test Execution**: Ensures the functionalities are working correctly before deployment.
+- **Automated Deployment**: Deploys the application to the cloud environment.
+- **Automated Infrastructure Provisioning**: Deploys the necessary infrastructure for the application to run, such as Kubernetes, API Gateway, Lambda Functions, and MongoDB.
 
-### Variáveis de Ambiente AWS
+## AWS Environment Variables
 
-- **`AWS_ACCESS_KEY_ID`**: ID da chave de acesso programático da conta AWS, usado para autenticação ao provisionar recursos AWS.
-- **`AWS_SECRET_ACCESS_KEY`**: Chave secreta vinculada ao `AWS_ACCESS_KEY_ID`, usada para autenticação segura com a AWS.
-- **`AWS_SESSION_TOKEN`**: Token temporário de sessão usado para autenticação na AWS em cenários de acesso seguro (normalmente gerado ao usar funções IAM ou MFA).
-- **`AWS_DEFAULT_REGION`**: Região AWS onde os serviços serão provisionados, como EC2, S3 e EKS (exemplo: `us-east-1`).
+- **`AWS_ACCESS_KEY_ID`**: The programmatic access key ID for the AWS account, used for authentication when provisioning AWS resources.
+- **`AWS_SECRET_ACCESS_KEY`**: The secret key associated with `AWS_ACCESS_KEY_ID`, used for secure authentication with AWS.
+- **`AWS_SESSION_TOKEN`**: Temporary session token used for AWS authentication in secure access scenarios (typically generated when using IAM roles or MFA).
+- **`AWS_DEFAULT_REGION`**: The AWS region where services like EC2, S3, and EKS will be provisioned (example: `us-east-1`).
 
-### Variáveis de Ambiente MongoDB Atlas
+## MongoDB Atlas Environment Variables
 
-- **`MONGODBATLAS_ORG_PRIVATE_KEY`**: Chave privada da organização do MongoDB Atlas, usada para autenticação em APIs de gerenciamento de MongoDB Atlas.
-- **`MONGODBATLAS_ORG_PUBLIC_KEY`**: Chave pública da organização do MongoDB Atlas, usada para autenticação em APIs de gerenciamento de MongoDB Atlas.
-- **`ORG_ID`**: ID único da organização no MongoDB Atlas, usado para referenciar a organização nos scripts e automações.
-- **`MONGO_HOST`**: Host (endereço) do cluster MongoDB que será provisionado, utilizado pela aplicação para se conectar ao banco de dados.
+- **`MONGODBATLAS_ORG_PRIVATE_KEY`**: Private key for the MongoDB Atlas organization, used for authentication with MongoDB Atlas management APIs.
+- **`MONGODBATLAS_ORG_PUBLIC_KEY`**: Public key for the MongoDB Atlas organization, used for authentication with MongoDB Atlas management APIs.
+- **`ORG_ID`**: Unique ID of the MongoDB Atlas organization, used to reference the organization in scripts and automations.
+- **`MONGO_HOST`**: The host (address) of the MongoDB cluster to be provisioned, used by the application to connect to the database.
 
-### Variáveis de Ambiente Docker
+## Docker Environment Variables
 
-- **`DOCKER_USERNAME`**: Nome de usuário do Docker Hub, usado para autenticação ao fazer login e fazer push das imagens Docker.
-- **`DOCKER_PASSWORD`**: Senha ou token de acesso do Docker Hub, usado em conjunto com o `DOCKER_USERNAME` para fazer login no Docker Hub.
+- **`DOCKER_USERNAME`**: Docker Hub username, used for authentication when logging in and pushing Docker images.
+- **`DOCKER_PASSWORD`**: Password or access token for Docker Hub, used alongside `DOCKER_USERNAME` to log in to Docker Hub.
 
-### Variáveis de Ambiente JWT
+## JWT Environment Variables
 
-- **`JWT_EXPIRES`**: Define o tempo de expiração dos tokens JWT usados pela aplicação para autenticação e autorização (geralmente em segundos).
-- **`JWT_SECRET`**: Chave secreta usada para assinar e validar os tokens JWT gerados pela aplicação.
+- **`JWT_EXPIRES`**: Defines the expiration time of JWT tokens used by the application for authentication and authorization (usually in seconds).
+- **`JWT_SECRET`**: Secret key used to sign and validate JWT tokens generated by the application.
 
-### Variáveis de Ambiente MongoDB para a Aplicação
+## MongoDB Application Environment Variables
 
-- **`MONGODBATLAS_USERNAME`**: Nome de usuário root usado para acessar o cluster MongoDB Atlas, configurado para autenticação no banco de dados.
-- **`MONGODBATLAS_PASSWORD`**: Senha associada ao `MONGODBATLAS_USERNAME`, usada para autenticação no MongoDB Atlas.
-- **`MONGODB_USER`**: Nome de usuário do banco de dados MongoDB específico da aplicação, usado para acessar o banco de dados provisionado.
-- **`MONGO_APP_DB`**: Nome do banco de dados dentro do MongoDB que a aplicação utilizará (exemplo: `snackbar`).
+- **`MONGODBATLAS_USERNAME`**: Root username used to access the MongoDB Atlas cluster, configured for database authentication.
+- **`MONGODBATLAS_PASSWORD`**: Password associated with `MONGODBATLAS_USERNAME`, used for MongoDB Atlas authentication.
+- **`MONGODB_USER`**: MongoDB database username specific to the application, used to access the provisioned database.
+- **`MONGO_APP_DB`**: The name of the database within MongoDB that the application will use (example: `snackbar`).
 
-### Outras Variáveis de Ambiente
+## Other Environment Variables
 
-- **`SONAR_TOKEN`**: Token usado para autenticação no SonarQube, necessário para integrar e rodar análises de qualidade de código.
-- **`BUCKET_S3`**: Nome do bucket S3 na AWS usado para salvar o tfstate usado no provisionamento da infraestrutura.
+- **`SONAR_TOKEN`**: Token used for authentication with SonarQube, necessary for integrating and running code quality analysis.
+- **`BUCKET_S3`**: Name of the S3 bucket in AWS used to store the `tfstate` file for infrastructure provisioning.
 
+## Ensure that these environment variables are correctly configured for the pipeline to work properly.
 
-Certifique-se de que essas variáveis de ambiente estão configuradas corretamente para o funcionamento adequado da pipeline.
+## How to Use
 
-## Como Utilizar
+To run the pipeline, ensure that all prerequisites are met, such as:
 
-Para executar a pipeline, você deve garantir que todos os pré-requisitos estão atendidos, como:
-1. Credenciais AWS configuradas corretamente.
-2. Credenciais MONGODB ATLAS configuradas corretamente.
-3. As variáveis de ambiente mencionadas acima configuradas corretamente.
+- Correctly configured AWS credentials.
+- Correctly configured MongoDB Atlas credentials.
+- The environment variables mentioned above are correctly set.
 
-A pipeline irá rodar automaticamente em cada push ou merge nas branch main dos seguintes repositórios:
-- https://github.com/fiap-9soat-snackbar/snackbar - repositório da aplicacão
-- https://github.com/fiap-9soat-snackbar/snackbar-lambda - repositório de provisionamento lambda 
-- https://github.com/fiap-9soat-snackbar/snackbar-database - repositório de provisionamento mongoDB Atlas.
-- https://github.com/fiap-9soat-snackbar/eks - repositório de provisionamento Kubernetes, através do AWS EKS.
-- https://github.com/fiap-9soat-snackbar/snackbar-api-gateway - repositório de provisionamento AWS API GATEWAY
+The pipeline will automatically run on every push or merge to the `main` branch of the following repositories:
+
+- https://github.com/fiap-9soat-snackbar/snackbar - application repository
+- https://github.com/fiap-9soat-snackbar/snackbar-lambda - lambda provisioning repository
+- https://github.com/fiap-9soat-snackbar/snackbar-database - MongoDB Atlas provisioning repository
+- https://github.com/fiap-9soat-snackbar/eks - Kubernetes provisioning repository using AWS EKS
+- https://github.com/fiap-9soat-snackbar/snackbar-api-gateway - AWS API Gateway provisioning repository

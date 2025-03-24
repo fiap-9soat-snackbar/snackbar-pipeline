@@ -182,7 +182,6 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
-        ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3

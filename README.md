@@ -18,7 +18,6 @@ All incoming requests pass through AWS API Gateway, invoking the Lambda Authoriz
   - Validates JWT token signature with a secret key.
   - Verifies token expiration.
 - **Lambda Layer:** Provides Python dependencies (`PyJWT`), isolating them from the main Lambda function.
-- **Snackbar Pipeline:** Automatically triggered upon successful authentication.
 ## 🧩 Why Use a Lambda Layer?
 
 Using Lambda Layers provides several advantages:

@@ -92,7 +92,7 @@ The integration workflow between API Gateway and Lambda Authorizer:
 
 ```json
 {
-  "isAuthorized": true
+  "isAuthorized": false
 }
 ```
 

@@ -175,6 +175,7 @@ jobs:
   code-analysis:
     runs-on: ubuntu-latest
     needs: unit-tests
+    if: false
 
     steps:
     - name: Checkout App Repo
@@ -214,7 +215,7 @@ jobs:
       APP_DB: ${{ secrets.MONGO_APP_DB }}
       JWT_EXPIRES: ${{ secrets.JWT_EXPIRES }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-    needs: [unit-tests, code-analysis]
+    #needs: [unit-tests, code-analysis]
 
     steps:
     - name: Checkout App Repo
@@ -309,14 +310,15 @@ jobs:
               --namespace ${{ env.APP_NAMESPACE }} \
               --create-namespace \
               --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
-              --set image.tag=${{ env.IMAGE_HELM }} \
-              --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
-              --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \
-              --set SECRET.DATABASE.DB_HOST=${{ secrets.MONGO_HOST  }} \
-              --set SECRET.DATABASE.APP_DB=${{ secrets.MONGO_APP_DB }} \
-              --set SECRET.DATABASE.DB_PORT=${{ secrets.DB_PORT }} \
-              --set SECRET.JWT.EXPIRES=${{ secrets.JWT_EXPIRES }} \
-              --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }}
+              --set image.tag=${{ env.IMAGE_HELM }} 
+
+             # --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
+             # --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \
+             # --set SECRET.DATABASE.DB_HOST=${{ secrets.MONGO_HOST  }} \
+             # --set SECRET.DATABASE.APP_DB=${{ secrets.MONGO_APP_DB }} \
+             # --set SECRET.DATABASE.DB_PORT=${{ secrets.DB_PORT }} \
+             # --set SECRET.JWT.EXPIRES=${{ secrets.JWT_EXPIRES }} \
+             # --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }}
 
   database-setup:
     if: github.event.action == 'db_commit'

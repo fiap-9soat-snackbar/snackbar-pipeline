@@ -204,8 +204,6 @@ jobs:
           -Dsonar.organization=fiap-9soat-snackbar \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.sources=src/main/java/
-          -Dsonar.java.binaries=target/classes
 
   build-and-push:
     runs-on: ubuntu-latest

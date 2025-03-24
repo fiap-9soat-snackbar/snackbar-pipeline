@@ -265,12 +265,13 @@ Follow these steps to create and run a test event using your copied JSON payload
 - Click **Save**.
 - Click **Test** to execute your new event.
 
-## ✅ Verify the Results
+### ✅ Verify the Results
 
-After executing your test requests, verify the responses based on the HTTP status code received:
+If the JWT token is valid and has not expired, the Lambda Authorizer will return:
 
-| HTTP Response                                 | Meaning                          |
-|-----------------------------------------------|----------------------------------|
-| **`200 OK`**                                  | ✅ Authorized (Valid JWT token)  |
-| **`401 Unauthorized` or `403 Forbidden`**     | ❌ Unauthorized (Invalid JWT token) |
+```json
+{
+  "isAuthorized": true
+}
+
 

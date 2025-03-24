@@ -80,8 +80,8 @@ jobs:
 
   vpc-destroy:
     runs-on: ubuntu-latest
-    needs: securitygroup-destroy
-
+    needs: [securitygroup-destroy, database-destroy,api-destroy,lambda-destroy]
+    
     steps:   
       - name: Checkout Kubernetes Repo
         uses: actions/checkout@v3
@@ -115,6 +115,57 @@ jobs:
         run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
         working-directory: terraform/us-east-1/network/vpc  
         continue-on-error: true
+
+  database-destroy:
+    runs-on: ubuntu-latest
+
+    steps:   
+      - name: Checkout Database Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/snackbar-database'
+          token: ${{ secrets.GH_TOKEN}}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.6
+
+      - name: Install MongoDB CLI
+        run: |
+              wget -qO- https://www.mongodb.org/static/pgp/server-8.0.asc | sudo tee /etc/apt/trusted.gpg.d/server-8.0.asc
+              echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+              sudo apt-get update
+              sudo apt-get install -y mongodb-mongosh
+
+      - name: Get NAT Gateway Public IP
+        id: get_nat_ip
+        run: |
+          NAT_IP=$(aws ec2 describe-nat-gateways --query "NatGateways[0].NatGatewayAddresses[0].PublicIp" --output text)
+          echo "NAT_IP=$NAT_IP" >> $GITHUB_ENV
+        
+      - name: Use NAT Gateway IP
+        run: |
+          echo "O IP público do NAT Gateway é: ${{ env.NAT_IP }}"
+
+      - name: Create DB variables.auto.tfvars
+        run: |
+            cat <<EOF > variables.auto.tfvars
+            org_id="${{ secrets.ORG_ID }}"
+            aws_nat_gateway="${{ env.NAT_IP }}"
+            mongodbatlas_org_public_key="${{ secrets.MONGODBATLAS_ORG_PUBLIC_KEY }}"
+            mongodbatlas_org_private_key="${{ secrets.MONGODBATLAS_ORG_PRIVATE_KEY }}"
+            mongodbatlas_username="${{ secrets.MONGODBATLAS_USERNAME }}"
+            mongodbatlas_password="${{ secrets.MONGODBATLAS_PASSWORD }}"
+            MONGODB_USER="${{ secrets.MONGODB_USER }}"
+            MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
+            EOF
+
+      - name: Init Dababase Setup
+        run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
+ 
+      - name: Plan Dababase Setup
+        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}"
  
   destroy-bucket:
     runs-on: ubuntu-latest
@@ -134,3 +185,81 @@ jobs:
           run: |
             aws s3 rm s3://${{ secrets.BUCKET_S3 }} --recursive
             aws s3api delete-bucket --bucket ${{ secrets.BUCKET_S3 }} --region us-east-1
+
+  lambda-destroy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Checkout Lambda Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/snackbar-lambda'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+            terraform_version: 1.3.6
+
+      - name: Create DB variables.auto.tfvars
+        run: |
+            cat <<EOF > variables.auto.tfvars
+            jwt_secret="${{ secrets.JWT_SECRET }}"
+            EOF
+
+      - name: Init Lambda Setup
+        run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
+      
+      - name: Plan Lambda Setup
+        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}"
+
+  api-destroy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Checkout API Gateway Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/snackbar-api-gateway'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+            terraform_version: 1.3.6
+      
+      - name: Get ELB DNS Name
+        id: get_elb_dns
+        run: |
+          DNS_NAME=$(aws elb describe-load-balancers --query "LoadBalancerDescriptions[0].DNSName" --output text)
+          echo "DNS_NAME=$DNS_NAME" >> $GITHUB_ENV
+      
+      - name: Use ELB DNS
+        run: |
+          echo "O DNS do Load Balancer é: ${{ env.DNS_NAME }}"
+
+      - name: Create API GATEWAY variables.auto.tfvars
+        run: |
+            cat <<EOF > variables.auto.tfvars
+            alb_dns_name="${{ env.DNS_NAME }}"
+            EOF
+
+      - name: Init API Gateway Setup
+        run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
+      
+      - name: Plan API Gateway Setup
+        run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
+        
+      - name: Apply API Gateway Setup
+        if: ${{ success() }}
+        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve  

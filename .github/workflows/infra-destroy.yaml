@@ -171,7 +171,7 @@ jobs:
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
  
       - name: Plan Dababase Setup
-        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}"
+        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
  
   destroy-bucket:
     runs-on: ubuntu-latest
@@ -222,7 +222,7 @@ jobs:
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
       
       - name: Plan Lambda Setup
-        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}"
+        run: terraform destroy -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
 
   api-destroy:
     runs-on: ubuntu-latest
@@ -262,9 +262,6 @@ jobs:
 
       - name: Init API Gateway Setup
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
-      
-      - name: Plan API Gateway Setup
-        run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
         
       - name: Apply API Gateway Setup
         if: ${{ success() }}

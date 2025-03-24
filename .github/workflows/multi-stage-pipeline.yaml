@@ -345,11 +345,21 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y mongodb-mongosh
 
+      - name: Get NAT Gateway Public IP
+        id: get_nat_ip
+        run: |
+          NAT_IP=$(aws ec2 describe-nat-gateways --query "NatGateways[0].NatGatewayAddresses[0].PublicIp" --output text)
+          echo "NAT_IP=$NAT_IP" >> $GITHUB_ENV
+        
+      - name: Use NAT Gateway IP
+        run: |
+          echo "O IP público do NAT Gateway é: ${{ env.NAT_IP }}"
+
       - name: Create DB variables.auto.tfvars
         run: |
             cat <<EOF > variables.auto.tfvars
             org_id="${{ secrets.ORG_ID }}"
-            aws_nat_gateway="${{ secrets.AWS_NAT_GATEWAY }}"
+            aws_nat_gateway="${{ env.NAT_IP }}"
             mongodbatlas_org_public_key="${{ secrets.MONGODBATLAS_ORG_PUBLIC_KEY }}"
             mongodbatlas_org_private_key="${{ secrets.MONGODBATLAS_ORG_PRIVATE_KEY }}"
             mongodbatlas_username="${{ secrets.MONGODBATLAS_USERNAME }}"

@@ -81,14 +81,20 @@ The integration workflow between API Gateway and Lambda Authorizer:
 3. Lambda Authorizer validates:
    - JWT token signature against the secret key.
    - Token expiration.
-4. Lambda returns response to API Gateway:
+4.Lambda returns a response to API Gateway on successful execution:
 
 ```json
 {
   "isAuthorized": true
 }
 ```
+5. Lambda returns an error response to API Gateway when execution fails:
 
+```json
+{
+  "isAuthorized": true
+}
+```
 
 ---
 

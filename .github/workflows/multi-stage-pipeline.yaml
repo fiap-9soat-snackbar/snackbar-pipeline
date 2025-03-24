@@ -151,7 +151,7 @@ jobs:
         with:
           repository: 'fiap-9soat-snackbar/snackbar'
           token: ${{ secrets.GH_TOKEN}}
-          ref: 'homolog'
+          ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -182,7 +182,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
-        ref: 'homolog'
+        ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -222,7 +222,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
-        ref: 'homolog'
+        ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -308,8 +308,7 @@ jobs:
               helm upgrade --install ${{ env.APP_NAME }} snackbar-charts/snackbar-app \
               --namespace ${{ env.APP_NAMESPACE }} \
               --create-namespace \
-              --set image.repository=${{ secrets.DOCKER_USERNAME }}/snackbar \
-              --set image.tag=${{ env.IMAGE_HELM }} 
+              --set IMAGE.TAG=${{ env.IMAGE_HELM }} 
 
              # --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
              # --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \

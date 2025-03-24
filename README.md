@@ -248,7 +248,7 @@ Follow these steps to create and run a test event using your copied JSON payload
     "routeKey": "GET /api/pickup",
     "rawPath": "/api/pickup",
     "headers": {
-        "authorization": f"Bearer {token}"
+        "authorization": Bearer {token}"
     },
     "requestContext": {
         "http": {

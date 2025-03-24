@@ -151,7 +151,7 @@ jobs:
         with:
           repository: 'fiap-9soat-snackbar/snackbar'
           token: ${{ secrets.GH_TOKEN}}
-          ref: 'feature/pipelines'
+          ref: 'homolog'
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -182,7 +182,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
-        ref: 'feature/pipelines'
+        ref: 'homolog'
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3

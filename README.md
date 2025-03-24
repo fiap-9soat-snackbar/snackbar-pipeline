@@ -130,7 +130,7 @@ This Python script is intended to facilitate testing of the Lambda Authorizer by
 - **Event Simulation:** Generates a mock API Gateway event in HTTP API 2.0 format compatible with AWS Lambda Authorizer testing.
 - **cURL Testing:** Provides a ready-to-run cURL command to verify the integration via the API Gateway endpoint.
 
-# 📌 Python Test Script
+## 📌 Python Test Script
 
 Save the following Python script as `generate_test_event.py`:
 

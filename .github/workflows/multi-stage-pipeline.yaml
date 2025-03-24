@@ -1,13 +1,60 @@
 name: MultiStage Pipeline
 
 on:
+  workflow_dispatch:
   repository_dispatch:
     types: [infra_commit, app_commit, api_commit, lambda_commit, db_commit]
 
 jobs:
-  global-setup:
-    if: github.event.action == 'infra_commit'
+
+  setup-bucket:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Configure S3 Bucket
+        continue-on-error: true
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
+        run: |
+          aws s3api create-bucket --bucket ${{ secrets.BUCKET_S3 }} --region us-east-1
+
+  install-helm-chart-repo:
+    runs-on: ubuntu-latest
+    needs: setup-bucket
+    if: always()
+
+    steps:
+      - name: Checkout Kubernetes Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/eks'
+          token: ${{ secrets.GH_TOKEN}}          
+          
+      - name: Init Helm
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+            BUCKET_S3: ${{ secrets.BUCKET_S3 }}
+        run: |
+          helm plugin install https://github.com/hypnoglow/helm-s3.git
+          helm s3 init s3://${{ secrets.BUCKET_S3 }} --ignore-if-exists
+          helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }}
+          helm package helm-chart/snackbar-app/
+          helm s3 push snackbar-app-1.0.0.tgz snackbar-charts --force
+          
+  global-setup:
+    if: github.event.action == 'infra_commit' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    needs: install-helm-chart-repo
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -142,7 +189,7 @@ jobs:
         working-directory: terraform/us-east-1/compute/eks/mithrandir
   
   unit-tests:
-    if: github.event.action == 'app_commit'
+    if: github.event.action == 'app_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -319,7 +366,7 @@ jobs:
              # --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }}
 
   database-setup:
-    if: github.event.action == 'db_commit'
+    if: github.event.action == 'db_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -380,7 +427,7 @@ jobs:
 
 
   lambda_pipeline:
-    if: github.event.action == 'lambda_commit'
+    if: github.event.action == 'lambda_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -418,8 +465,9 @@ jobs:
   
 
   api_pipeline:
-    if: github.event.action == 'api_commit'
+    if: github.event.action == 'api_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    needs: lambda_pipeline
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -462,7 +510,28 @@ jobs:
         
       - name: Apply API Gateway Setup
         if: ${{ success() }}
-        run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve   
+        run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve  
+
+  app_ready:
+    runs-on: ubuntu-latest
+    needs: api_pipeline
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Get APP DNS Name
+        id: get_elb_dns
+        run: |
+          DNS_NAME=$(aws elb describe-load-balancers --query "LoadBalancerDescriptions[0].DNSName" --output text)
+          echo "DNS_NAME=$DNS_NAME" >> $GITHUB_ENV
+      
+      - name: Use ELB DNS
+        run: |
+          echo "O endereo da APP é: ${{ env.DNS_NAME }}swagger-ui/index.html"
+
 
 
 

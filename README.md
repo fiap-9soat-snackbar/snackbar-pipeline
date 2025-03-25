@@ -70,3 +70,20 @@ The pipeline will automatically run on every push or merge to the `main` branch 
 - https://github.com/fiap-9soat-snackbar/snackbar-database - MongoDB Atlas provisioning repository
 - https://github.com/fiap-9soat-snackbar/eks - Kubernetes provisioning repository using AWS EKS
 - https://github.com/fiap-9soat-snackbar/snackbar-api-gateway - AWS API Gateway provisioning repository
+
+
+## Running the Pipeline Manually
+
+To manually trigger the pipeline, follow these steps:
+
+1. Navigate to the **snackbar-pipelines repository** where the pipeline is configured.
+2. Click on the **"Actions"** tab located at the top of the repository.
+3. In the list of workflows on the left, look for and select **"multi-stage-pipelines"**.
+4. Once selected, click the **"Run workflow"** button on the right side of the page.
+5. You can select the branch you want to run the pipeline on or use the main branch 
+6. Click **"Run workflow"** to start the pipeline manually.
+
+This will trigger the multi-stage pipeline and run the steps including build, test, and deploy stages based on the current code in the main branch.
+
+To provision a homolog environment, commit to the homolog branch in the snackbar application repository. This way, the pipeline will provision a homolog docker image and homolog namespace in Kubernetes dedicated to this environment.
+

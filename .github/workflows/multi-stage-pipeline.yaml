@@ -529,7 +529,7 @@ jobs:
         id: get_elb_dns
         run: |
           DNS_NAME=$(aws elb describe-load-balancers --query "LoadBalancerDescriptions[0].DNSName" --output text)
-          echo "O endereço da Aplicacão Snackbar é: $DNS_NAME/swagger-ui/index.html" 
+          echo "O endereço da Aplicacão Snackbar é: $DNS_NAME/actuator/health" 
 
       - name: Get API GATEWAY ENDPOINT Name
         id: get_api_gateway_endpoint

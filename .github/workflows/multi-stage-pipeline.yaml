@@ -199,7 +199,7 @@ jobs:
         with:
           repository: 'fiap-9soat-snackbar/snackbar'
           token: ${{ secrets.GH_TOKEN}}
-          ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
+          ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -230,7 +230,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
-        ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
+        ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -270,7 +270,7 @@ jobs:
       with:
         repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
-        ref: ${{ github.event.client_payload.branch == 'main' && 'main' || 'homolog' }}
+        ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -299,9 +299,9 @@ jobs:
 
     - name: Set Docker image tag based on branch
       run: |
-        if [[ "${{ github.event.client_payload.branch }}" == "main" ]]; then
+        if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-        elif [[ "${{ github.event.client_payload.branch }}" != "main" ]]; then
+        else
           echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
         fi
         
@@ -341,11 +341,11 @@ jobs:
 
       - name: Set helm env
         run: |
-          if [[ "${{ github.event.client_payload.branch }}" == "main" ]]; then
+          if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "IMAGE_HELM=latest" >> $GITHUB_ENV
             echo "APP_NAME=snackbar-prod" >> $GITHUB_ENV
             echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
-          elif [[ "${{ github.event.client_payload.branch }}" != "main" ]]; then
+          else
             echo "IMAGE_HELM=homolog" >> $GITHUB_ENV
             echo "APP_NAME=snackbar-homolog" >> $GITHUB_ENV
             echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV

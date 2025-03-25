@@ -53,9 +53,7 @@ The main objective of this pipeline is to automate the following steps:
 - **`SONAR_TOKEN`**: Token used for authentication with SonarQube, necessary for integrating and running code quality analysis.
 - **`BUCKET_S3`**: Name of the S3 bucket in AWS used to store the `tfstate` file for infrastructure provisioning.
 
-
-Ensure that these environment variables are correctly configured for the pipeline to work properly:
-
+Environment variables that are mandatory
 - `AWS_ACCESS_KEY_ID`
 - `AWS_DEFAULT_REGION`
 - `AWS_SECRET_ACCESS_KEY`
@@ -63,6 +61,8 @@ Ensure that these environment variables are correctly configured for the pipelin
 - `MONGODBATLAS_ORG_PRIVATE_KEY`
 - `MONGODBATLAS_ORG_PUBLIC_KEY`
 - `ORG_ID`
+
+Ensure that these environment variables are correctly configured for the pipeline to work properly.
 
 ## How to Use
 

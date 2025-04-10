@@ -5,6 +5,10 @@ on:
   repository_dispatch:
     types: [infra_commit, app_commit, api_commit, lambda_commit, db_commit]
 
+env:
+  ORIGIN_REPO: ${{ github.event.repository.name }}
+  ORIGIN_REPO_FULL: ${{ github.event.repository.full_name }}
+
 jobs:
 
   setup-bucket:
@@ -197,7 +201,7 @@ jobs:
       - name: Checkout App Repo
         uses: actions/checkout@v3
         with:
-          repository: 'fiap-9soat-snackbar/snackbar'
+          repository: ${{ env.ORIGIN_REPO_FULL }}
           token: ${{ secrets.GH_TOKEN}}
           ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
@@ -228,7 +232,7 @@ jobs:
     - name: Checkout App Repo
       uses: actions/checkout@v3
       with:
-        repository: 'fiap-9soat-snackbar/snackbar'
+        repository: ${{ env.ORIGIN_REPO_FULL }}
         token: ${{ secrets.GH_TOKEN}}
         ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
@@ -248,7 +252,7 @@ jobs:
     - name: Run SonarCloud Analysis
       run: |
         mvn -f backend/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
-          -Dsonar.projectKey=fiap-9soat-snackbar_snackbar \
+          -Dsonar.projectKey=fiap-9soat-snackbar_${{ env.ORIGIN_REPO }} \
           -Dsonar.organization=fiap-9soat-snackbar \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
@@ -268,25 +272,19 @@ jobs:
     - name: Checkout App Repo
       uses: actions/checkout@v3
       with:
-        repository: 'fiap-9soat-snackbar/snackbar'
+        repository: ${{ env.ORIGIN_REPO_FULL }}
         token: ${{ secrets.GH_TOKEN}}
         ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '21'
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-maven-
-          
-    - name: Build with Maven
-      run: mvn -f backend/pom.xml package
+    - name: Set Docker image tag based on branch
+      run: |
+          echo "APP_NAME=${{ env.ORIGIN_REPO }}" >> $GITHUB_ENV
+          if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          else
+            echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
+          fi
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -296,24 +294,15 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Set Docker image tag based on branch
-      run: |
-        if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-        else
-          echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
-        fi
         
-    - name: Set Docker repo Snackbar
-      run: echo "DOCKER_REPO_SNACKBAR=snackbar" >> $GITHUB_ENV
-      
     - name: Build and push Snackbar Docker image
       run: |
         set -x
         cd backend
-        docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ env.DOCKER_REPO_SNACKBAR }}:${{ env.IMAGE_TAG }} --push --no-cache .
-
+        docker buildx build --platform linux/amd64,linux/arm64 \
+           -t ${{ secrets.DOCKER_USERNAME }}/${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} \
+           --push .
+        
     - name: Docker logout
       run: docker logout
 
@@ -333,30 +322,29 @@ jobs:
   
       - name: Configure kubectl for EKS
         run: aws eks update-kubeconfig --name snackbar-mithrandir --region ${{ vars.AWS_DEFAULT_REGION}}
-  
-      - name: Init Helm
-        run: |
-              helm plugin install https://github.com/hypnoglow/helm-s3.git
-              helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }}
 
-      - name: Set helm env
+      - name: Set Helm variables
         run: |
-          if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "IMAGE_HELM=latest" >> $GITHUB_ENV
-            echo "APP_NAME=snackbar-prod" >> $GITHUB_ENV
-            echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
-          else
-            echo "IMAGE_HELM=homolog" >> $GITHUB_ENV
-            echo "APP_NAME=snackbar-homolog" >> $GITHUB_ENV
-            echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV
-          fi
+              echo "APP_NAME=${{ env.ORIGIN_REPO }}" >> $GITHUB_ENV
+              if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+                echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+                echo "DEPLOY_NAME=${{ env.APP_NAME }}-prod" >> $GITHUB_ENV
+                echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
+              else
+                echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
+                echo "DEPLOY_NAME=${{ env.APP_NAME }}-homolog" >> $GITHUB_ENV
+                echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV
+              fi
   
       - name: Helm Upgrade/Install
         run: |
-              helm upgrade --install ${{ env.APP_NAME }} snackbar-charts/snackbar-app \
-              --namespace ${{ env.APP_NAMESPACE }} \
-              --create-namespace \
-              --set IMAGE.TAG=${{ env.IMAGE_HELM }} 
+              helm plugin install https://github.com/hypnoglow/helm-s3.git
+              helm repo add snackbar-charts s3://${{ secrets.BUCKET_S3 }}
+    
+              helm upgrade --install ${{ env.DEPLOY_NAME }} snackbar-charts/snackbar-app \
+                --namespace ${{ env.APP_NAMESPACE }} \
+                --create-namespace \
+                --set IMAGE.TAG=${{ env.IMAGE_TAG }}
 
              # --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
              # --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \

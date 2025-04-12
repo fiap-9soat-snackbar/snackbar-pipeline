@@ -2,8 +2,6 @@ name: MultiStage Pipeline
 
 on:
   workflow_dispatch:
-  repository_dispatch:
-    types: [infra_commit, app_commit, api_commit, lambda_commit, db_commit]
 
 jobs:
 
@@ -52,7 +50,6 @@ jobs:
           helm s3 push snackbar-app-1.0.0.tgz snackbar-charts --force
           
   global-setup:
-    if: github.event.action == 'infra_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: install-helm-chart-repo
     env:
@@ -189,16 +186,15 @@ jobs:
         working-directory: terraform/us-east-1/compute/eks/mithrandir
   
   unit-tests:
-    if: github.event.action == 'app_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: eks-setup
 
     steps:
-      - name: Checkout Pipeline Repo
-        uses: actions/checkout@v3
-  
-      - name: Setup Repo Info
-        uses: ./.github/actions/setup-repo-info
+     # - name: Checkout Pipeline Repo
+     #   uses: actions/checkout@v3
+  #
+     # - name: Setup Repo Info
+     #   uses: ./.github/actions/setup-repo-info
   
       #- name: Checkout App Repo
       #  uses: actions/checkout@v3
@@ -384,7 +380,6 @@ jobs:
              # --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }}
 
   database-setup:
-    if: github.event.action == 'db_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: securitygroup-setup
     env:
@@ -446,7 +441,6 @@ jobs:
 
 
   lambda_pipeline:
-    if: github.event.action == 'lambda_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: deploy
     env:
@@ -485,7 +479,6 @@ jobs:
   
 
   api_pipeline:
-    if: github.event.action == 'api_commit' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: [deploy,lambda_pipeline]
     env:

@@ -1,0 +1,62 @@
+name: Database Pipeline
+
+on:
+  repository_dispatch:
+    types: [db_commit]
+    #types: [infra_commit, app_commit, api_commit, lambda_commit, db_commit]
+
+jobs:
+  database-deploy:
+    runs-on: ubuntu-latest
+    env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION}}
+        AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+    steps:
+      - name: Checkout Database Repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'fiap-9soat-snackbar/snackbar-database'
+          token: ${{ secrets.GH_TOKEN}}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.6
+
+      - name: Install MongoDB CLI
+        run: |
+              wget -qO- https://www.mongodb.org/static/pgp/server-8.0.asc | sudo tee /etc/apt/trusted.gpg.d/server-8.0.asc
+              echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
+              sudo apt-get update
+              sudo apt-get install -y mongodb-mongosh
+
+      - name: Get NAT Gateway Public IP
+        id: get_nat_ip
+        run: |
+              NAT_IP=$(aws ec2 describe-nat-gateways --query "NatGateways[0].NatGatewayAddresses[0].PublicIp" --output text)
+              echo "NAT_IP=$NAT_IP" >> $GITHUB_ENV
+
+      - name: Create DB variables.auto.tfvars
+        run: |
+            cat <<EOF > variables.auto.tfvars
+            org_id="${{ secrets.ORG_ID }}"
+            aws_nat_gateway="${{ env.NAT_IP }}"
+            mongodbatlas_org_public_key="${{ secrets.MONGODBATLAS_ORG_PUBLIC_KEY }}"
+            mongodbatlas_org_private_key="${{ secrets.MONGODBATLAS_ORG_PRIVATE_KEY }}"
+            mongodbatlas_username="${{ secrets.MONGODBATLAS_USERNAME }}"
+            mongodbatlas_password="${{ secrets.MONGODBATLAS_PASSWORD }}"
+            MONGODB_USER="${{ secrets.MONGODB_USER }}"
+            MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
+            EOF
+      
+      - name: Init Dababase Setup
+        run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"
+
+      - name: Plan Dababase Setup
+        run: terraform plan -var="bucket=${{ secrets.BUCKET_S3 }}"
+    
+      - name: Apply Dababase Setup
+        if: ${{ success() }}
+        run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve

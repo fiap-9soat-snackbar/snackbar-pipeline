@@ -200,10 +200,17 @@ jobs:
       - name: Setup Repo Info
         uses: ./.github/actions/setup-repo-info
   
+      #- name: Checkout App Repo
+      #  uses: actions/checkout@v3
+      #  with:
+      #    repository: ${{ env.ORIGIN_REPO_FULL }}
+      #    token: ${{ secrets.GH_TOKEN}}
+      #    ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
+
       - name: Checkout App Repo
         uses: actions/checkout@v3
         with:
-          repository: ${{ env.ORIGIN_REPO_FULL }}
+          repository: 'fiap-9soat-snackbar/snackbar'
           token: ${{ secrets.GH_TOKEN}}
           ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 

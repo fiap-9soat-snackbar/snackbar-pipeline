@@ -189,12 +189,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: eks-setup
 
-    steps:
+    strategy:
+      matrix:
+        include:
+          - app_name: snackbar
+            repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-novo-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
 
+
+    steps:
       - name: Checkout App Repo
         uses: actions/checkout@v3
         with:
-          repository: 'fiap-9soat-snackbar/snackbar'
+          repository:  ${{ matrix.repository_full_name }}
           token: ${{ secrets.GH_TOKEN}}
           ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
@@ -221,11 +231,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: eks-setup
 
+    strategy:
+      matrix:
+        include:
+          - app_name: snackbar
+            repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-novo-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
+
+
     steps:
     - name: Checkout App Repo
       uses: actions/checkout@v3
       with:
-        repository: 'fiap-9soat-snackbar/snackbar'
+        repository:  ${{ matrix.repository_full_name }}
         token: ${{ secrets.GH_TOKEN}}
         ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
@@ -245,7 +266,7 @@ jobs:
     - name: Run SonarCloud Analysis
       run: |
         mvn -f backend/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
-          -Dsonar.projectKey=fiap-9soat-snackbar_snackbar \
+          -Dsonar.projectKey=fiap-9soat-snackbar_${{ matrix.app_name }} \
           -Dsonar.organization=fiap-9soat-snackbar \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
@@ -261,19 +282,28 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
     needs: [unit-tests, code-analysis]
 
-    steps:
+    strategy:
+      matrix:
+        include:
+          - app_name: snackbar
+            repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-novo-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
 
+    steps:
     - name: Checkout App Repo
       uses: actions/checkout@v3
       with:
-        repository: 'fiap-9soat-snackbar/snackbar'
+        repository:  ${{ matrix.repository_full_name }}
         token: ${{ secrets.GH_TOKEN}}
         ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
 
     - name: Set Docker image tag based on branch
       run: |
-          echo "APP_NAME=snackbar" >> $GITHUB_ENV
+          echo "APP_NAME=${{ matrix.app_name }}" >> $GITHUB_ENV
           if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "IMAGE_TAG=latest" >> $GITHUB_ENV
           else
@@ -309,8 +339,24 @@ jobs:
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     needs: [build-and-push]
 
+    strategy:
+      matrix:
+        include:
+          - app_name: snackbar
+            repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-novo-teste
+            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
+
+
     steps:
-  
+      - name: Checkout App Repo
+        uses: actions/checkout@v3
+        with:
+          repository:  ${{ matrix.repository_full_name }}
+          token: ${{ secrets.GH_TOKEN}}
+          ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
       - name: Install Helm
         run: |
@@ -321,14 +367,14 @@ jobs:
 
       - name: Set Helm variables
         run: |
-              echo "APP_NAME=snackbar" >> $GITHUB_ENV
+              echo "APP_NAME=${{ matrix.app_name }}" >> $GITHUB_ENV
               if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
                 echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-                echo "DEPLOY_NAME=snackbar-prod" >> $GITHUB_ENV
+                echo "DEPLOY_NAME=${{ matrix.app_name }}-prod" >> $GITHUB_ENV
                 echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
               else
                 echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
-                echo "DEPLOY_NAME=snackbar-homolog" >> $GITHUB_ENV
+                echo "DEPLOY_NAME=${{ matrix.app_name }}-homolog" >> $GITHUB_ENV
                 echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV
               fi
   

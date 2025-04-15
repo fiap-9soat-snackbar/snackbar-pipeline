@@ -190,18 +190,6 @@ jobs:
     needs: eks-setup
 
     steps:
-     # - name: Checkout Pipeline Repo
-     #   uses: actions/checkout@v3
-  #
-     # - name: Setup Repo Info
-     #   uses: ./.github/actions/setup-repo-info
-  
-      #- name: Checkout App Repo
-      #  uses: actions/checkout@v3
-      #  with:
-      #    repository: ${{ env.ORIGIN_REPO_FULL }}
-      #    token: ${{ secrets.GH_TOKEN}}
-      #    ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
       - name: Checkout App Repo
         uses: actions/checkout@v3
@@ -234,17 +222,10 @@ jobs:
     needs: eks-setup
 
     steps:
-    - name: Checkout Pipeline Repo
-      uses: actions/checkout@v3
-  
-    - name: Setup Repo Info
-      uses: ./.github/actions/setup-repo-info
-  
-
     - name: Checkout App Repo
       uses: actions/checkout@v3
       with:
-        repository: ${{ env.ORIGIN_REPO_FULL }}
+        repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
         ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
@@ -264,7 +245,7 @@ jobs:
     - name: Run SonarCloud Analysis
       run: |
         mvn -f backend/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar \
-          -Dsonar.projectKey=fiap-9soat-snackbar_${{ env.ORIGIN_REPO }} \
+          -Dsonar.projectKey=fiap-9soat-snackbar_snackbar \
           -Dsonar.organization=fiap-9soat-snackbar \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
@@ -281,23 +262,18 @@ jobs:
     needs: [unit-tests, code-analysis]
 
     steps:
-    - name: Checkout Pipeline Repo
-      uses: actions/checkout@v3
-
-    - name: Setup Repo Info
-      uses: ./.github/actions/setup-repo-info
 
     - name: Checkout App Repo
       uses: actions/checkout@v3
       with:
-        repository: ${{ env.ORIGIN_REPO_FULL }}
+        repository: 'fiap-9soat-snackbar/snackbar'
         token: ${{ secrets.GH_TOKEN}}
         ref: ${{ github.event.client_payload.branch == 'main' || github.event_name == 'workflow_dispatch' && 'main' || 'homolog' }}
 
 
     - name: Set Docker image tag based on branch
       run: |
-          echo "APP_NAME=${{ env.ORIGIN_REPO }}" >> $GITHUB_ENV
+          echo "APP_NAME=snackbar" >> $GITHUB_ENV
           if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "IMAGE_TAG=latest" >> $GITHUB_ENV
           else
@@ -334,11 +310,6 @@ jobs:
     needs: [build-and-push]
 
     steps:
-      - name: Checkout Pipeline Repo
-        uses: actions/checkout@v3
-  
-      - name: Setup Repo Info
-        uses: ./.github/actions/setup-repo-info
   
 
       - name: Install Helm
@@ -350,14 +321,14 @@ jobs:
 
       - name: Set Helm variables
         run: |
-              echo "APP_NAME=${{ env.ORIGIN_REPO }}" >> $GITHUB_ENV
+              echo "APP_NAME=snackbar" >> $GITHUB_ENV
               if [[ "${{ github.event.client_payload.branch }}" == "main" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
                 echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-                echo "DEPLOY_NAME=${{ env.APP_NAME }}-prod" >> $GITHUB_ENV
+                echo "DEPLOY_NAME=snackbar-prod" >> $GITHUB_ENV
                 echo "APP_NAMESPACE=prod" >> $GITHUB_ENV
               else
                 echo "IMAGE_TAG=homolog" >> $GITHUB_ENV
-                echo "DEPLOY_NAME=${{ env.APP_NAME }}-homolog" >> $GITHUB_ENV
+                echo "DEPLOY_NAME=snackbar-homolog" >> $GITHUB_ENV
                 echo "APP_NAMESPACE=homolog" >> $GITHUB_ENV
               fi
   

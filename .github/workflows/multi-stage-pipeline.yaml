@@ -7,6 +7,8 @@ jobs:
 
   setup-bucket:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
 
     steps:
       - name: Checkout repository
@@ -25,6 +27,8 @@ jobs:
 
   install-helm-chart-repo:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: setup-bucket
     if: always()
 
@@ -51,6 +55,8 @@ jobs:
           
   global-setup:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: install-helm-chart-repo
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -85,6 +91,8 @@ jobs:
 
   vpc-setup:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -119,6 +127,8 @@ jobs:
 
   securitygroup-setup:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -153,6 +163,8 @@ jobs:
         
   eks-setup:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -187,6 +199,8 @@ jobs:
   
   unit-tests:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: eks-setup
 
     strategy:
@@ -229,6 +243,8 @@ jobs:
 
   code-analysis:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: eks-setup
 
     strategy:
@@ -273,6 +289,8 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       MONGODB_USER: ${{ secrets.MONGODB_USER }}
       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
@@ -332,6 +350,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -398,6 +418,8 @@ jobs:
 
   database-setup:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: securitygroup-setup
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -459,6 +481,8 @@ jobs:
 
   lambda_pipeline:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: deploy
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -497,6 +521,8 @@ jobs:
 
   api_pipeline:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: [deploy,lambda_pipeline]
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -544,6 +570,8 @@ jobs:
 
   app_ready:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs: api_pipeline
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

@@ -152,16 +152,6 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y mongodb-mongosh
 
-      - name: Get NAT Gateway Public IP
-        id: get_nat_ip
-        run: |
-          NAT_IP=$(aws ec2 describe-nat-gateways --query "NatGateways[0].NatGatewayAddresses[0].PublicIp" --output text)
-          echo "NAT_IP=$NAT_IP" >> $GITHUB_ENV
-        
-      - name: Use NAT Gateway IP
-        run: |
-          echo "O IP público do NAT Gateway é: ${{ env.NAT_IP }}"
-
       - name: Create DB variables.auto.tfvars
         run: |
             cat <<EOF > variables.auto.tfvars
@@ -263,16 +253,6 @@ jobs:
         run: |
           DNS_NAME=$(aws elb describe-load-balancers --query "LoadBalancerDescriptions[0].DNSName" --output text)
           echo "DNS_NAME=$DNS_NAME" >> $GITHUB_ENV
-      
-      - name: Use ELB DNS
-        run: |
-          echo "O DNS do Load Balancer é: ${{ env.DNS_NAME }}"
-
-      - name: Create API GATEWAY variables.auto.tfvars
-        run: |
-            cat <<EOF > variables.auto.tfvars
-            alb_dns_name="${{ env.DNS_NAME }}"
-            EOF
 
       - name: Init API Gateway Setup
         run: terraform init -backend-config="bucket=${{ secrets.BUCKET_S3 }}"

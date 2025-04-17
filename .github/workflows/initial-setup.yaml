@@ -6,6 +6,9 @@ on:
 jobs:
   setup-bucket:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
+
 
     steps:
       - name: Checkout repository
@@ -25,6 +28,8 @@ jobs:
   install-helm-chart:
     runs-on: ubuntu-latest
     needs: setup-bucket
+    environment:
+      name: ${{ github.ref_name }}
     if: always()
 
     steps:

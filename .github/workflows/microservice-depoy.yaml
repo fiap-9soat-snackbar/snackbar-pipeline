@@ -7,6 +7,8 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
 
     steps:
       - name: Checkout App Repo
@@ -37,6 +39,8 @@ jobs:
 
   code-analysis:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
 
     steps:
       - name: Checkout App Repo
@@ -69,6 +73,8 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       MONGODB_USER: ${{ secrets.MONGODB_USER }}
       MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
@@ -117,6 +123,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

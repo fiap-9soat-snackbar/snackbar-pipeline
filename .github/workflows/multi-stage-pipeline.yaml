@@ -460,6 +460,7 @@ jobs:
             cat <<EOF > variables.auto.tfvars
             org_id="${{ secrets.ORG_ID }}"
             aws_nat_gateway="${{ env.NAT_IP }}"
+            mongodb_cluster_name="${{ secrets.MONGO_HOST }}"
             mongodbatlas_org_public_key="${{ secrets.MONGODBATLAS_ORG_PUBLIC_KEY }}"
             mongodbatlas_org_private_key="${{ secrets.MONGODBATLAS_ORG_PRIVATE_KEY }}"
             mongodbatlas_username="${{ secrets.MONGODBATLAS_USERNAME }}"

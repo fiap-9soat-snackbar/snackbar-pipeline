@@ -208,8 +208,8 @@ jobs:
         include:
           - app_name: snackbar
             repository_full_name: fiap-9soat-snackbar/snackbar
-          - app_name: snackbar-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-management
+            repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-novo-teste
             repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
 
@@ -252,8 +252,8 @@ jobs:
         include:
           - app_name: snackbar
             repository_full_name: fiap-9soat-snackbar/snackbar
-          - app_name: snackbar-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-management
+            repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-novo-teste
             repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
 
@@ -309,8 +309,8 @@ jobs:
         include:
           - app_name: snackbar
             repository_full_name: fiap-9soat-snackbar/snackbar
-          - app_name: snackbar-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-management
+            repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-novo-teste
             repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
 
@@ -368,8 +368,8 @@ jobs:
         include:
           - app_name: snackbar
             repository_full_name: fiap-9soat-snackbar/snackbar
-          - app_name: snackbar-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-teste
+          - app_name: snackbar-management
+            repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-novo-teste
             repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
 

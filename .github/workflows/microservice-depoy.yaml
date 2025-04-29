@@ -92,6 +92,10 @@ jobs:
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
 
+    - name: Run Test Coverage Analysis
+      run: |
+        mvn -f backend/pom.xml clean verify -Dcoverage.minimum=0.00
+
   build-and-push:
     runs-on: ubuntu-latest
     environment:

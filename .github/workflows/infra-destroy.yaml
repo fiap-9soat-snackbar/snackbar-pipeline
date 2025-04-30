@@ -206,6 +206,7 @@ jobs:
 
   lambda-destroy:
     runs-on: ubuntu-latest
+    needs: api-destroy
     environment:
       name: ${{ github.ref_name }}
     env:

@@ -212,7 +212,7 @@ jobs:
                 --set IMAGE.TAG=${{ env.IMAGE_TAG }} \
                 --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
                 --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \
-                --set SECRET.DATABASE.DB_HOST=${{ secrets.MONGO_HOST }} \
+                --set SECRET.DATABASE.DB_HOST=${{ vars.MONGO_HOST }} \
                 --set SECRET.DATABASE.APP_DB=${{ matrix.app_name }} \
                 --set SECRET.JWT.EXPIRES=${{ secrets.JWT_EXPIRES }} \
                 --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }} \

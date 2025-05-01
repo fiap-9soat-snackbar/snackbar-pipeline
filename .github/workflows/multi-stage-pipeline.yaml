@@ -356,7 +356,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION}}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-    needs: [build-and-push, database-mongodb-setup]
+    needs: [build-and-push, database-mongodb-setup, database-rds-setup]
 
     strategy:
       matrix:
@@ -412,6 +412,8 @@ jobs:
                 --set SECRET.DATABASE.APP_DB=${{ matrix.app_name }} \
                 --set SECRET.JWT.EXPIRES=${{ secrets.JWT_EXPIRES }} \
                 --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }} \
+                --set SECRET.DATABASE.RDS_HOST=${{ needs.database-rds-setup.outputs.rds-conn }} \
+                --set SECRET.DATABASE.RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
 
   database-mongodb-setup:
     runs-on: ubuntu-latest
@@ -489,9 +491,12 @@ jobs:
 
   database-rds-setup:
     runs-on: ubuntu-latest
+    needs: securitygroup-setup
     environment:
       name: ${{ github.ref_name }}
-    needs: securitygroup-setup
+    outputs:
+      rds-conn: ${{ steps.rds.outputs.connection_string}}
+    
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -508,6 +513,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.3.6
+          terraform_wrapper: false
         
       - name: Create DB RDS variables.auto.tfvars
         run: |
@@ -524,6 +530,13 @@ jobs:
       - name: Apply RDS Dababase Setup
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
+
+      - name: Get RDS Connection String
+        id: rds
+        run: |
+          raw_conn=$(terraform output -raw rds_endpoint)
+          host_only=${raw_conn%%:*}
+          echo "connection_string=$host_only" >> $GITHUB_OUTPUT
 
   lambda_pipeline:
     runs-on: ubuntu-latest

@@ -476,18 +476,6 @@ jobs:
         if: ${{ success() }}
         run: terraform apply -var="bucket=${{ secrets.BUCKET_S3 }}" -auto-approve
 
-      - name: Get Mongo Connection String
-        id: mongo
-        run: |
-          raw_conn=$(terraform output -raw connection_string)
-          host_only=${raw_conn#*://}
-          echo "MONGO_CONN_STRING=$host_only" >> $GITHUB_ENV
-
-      - name: Show connection string (for debug)
-        run: |
-          echo "MongoDB Host: $MONGO_CONN_STRING"
-
-
   database-rds-setup:
     runs-on: ubuntu-latest
     environment:

@@ -356,7 +356,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION}}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-    needs: [build-and-push]
+    needs: [build-and-push, database-mongodb-setup]
 
     strategy:
       matrix:
@@ -408,16 +408,18 @@ jobs:
                 --set IMAGE.TAG=${{ env.IMAGE_TAG }} \
                 --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
                 --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \
-                --set SECRET.DATABASE.DB_HOST=${{ vars.MONGO_HOST }} \
+                --set SECRET.DATABASE.DB_HOST=${{ needs.database-mongodb-setup.outputs.mongo-conn }} \
                 --set SECRET.DATABASE.APP_DB=${{ matrix.app_name }} \
                 --set SECRET.JWT.EXPIRES=${{ secrets.JWT_EXPIRES }} \
                 --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }} \
 
   database-mongodb-setup:
     runs-on: ubuntu-latest
+    needs: securitygroup-setup
+    outputs:
+      mongo-conn: ${{ steps.mongo.outputs.connection_string }}
     environment:
       name: ${{ github.ref_name }}
-    needs: securitygroup-setup
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -482,11 +484,7 @@ jobs:
         run: |
           raw_conn=$(terraform output -raw connection_string)
           host_only=${raw_conn#*://}
-          echo "MONGO_CONN_STRING=$host_only" >> $GITHUB_ENV
-
-      - name: Show connection string (for debug)
-        run: |
-          echo "MongoDB Host: $MONGO_CONN_STRING"
+          echo "connection_string=$host_only" >> $GITHUB_OUTPUT
 
 
   database-rds-setup:

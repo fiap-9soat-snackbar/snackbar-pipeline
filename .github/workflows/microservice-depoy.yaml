@@ -18,8 +18,8 @@ jobs:
             repository_full_name: fiap-9soat-snackbar/snackbar
           #- app_name: snackbar-management
           #  repository_full_name: fiap-9soat-snackbar/snackbar-management
-          - app_name: snackbar-novo-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
+          - app_name: snackbar-production
+            repository_full_name: fiap-9soat-snackbar/snackbar-production
 
     steps:
       - name: Checkout App Repo
@@ -56,8 +56,8 @@ jobs:
             repository_full_name: fiap-9soat-snackbar/snackbar
           #- app_name: snackbar-management
           #  repository_full_name: fiap-9soat-snackbar/snackbar-management
-          - app_name: snackbar-novo-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
+          - app_name: snackbar-production
+            repository_full_name: fiap-9soat-snackbar/snackbar-production
 
     steps:
     - name: Checkout App Repo
@@ -110,8 +110,8 @@ jobs:
             repository_full_name: fiap-9soat-snackbar/snackbar
           #- app_name: snackbar-management
           #  repository_full_name: fiap-9soat-snackbar/snackbar-management
-          - app_name: snackbar-novo-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
+          - app_name: snackbar-production
+            repository_full_name: fiap-9soat-snackbar/snackbar-production
 
     steps:
     - name: Checkout App Repo
@@ -169,8 +169,8 @@ jobs:
             repository_full_name: fiap-9soat-snackbar/snackbar
           #- app_name: snackbar-management
           #  repository_full_name: fiap-9soat-snackbar/snackbar-management
-          - app_name: snackbar-novo-teste
-            repository_full_name: fiap-9soat-snackbar/snackbar-novo-teste
+          - app_name: snackbar-production
+            repository_full_name: fiap-9soat-snackbar/snackbar-production
 
 
     steps:

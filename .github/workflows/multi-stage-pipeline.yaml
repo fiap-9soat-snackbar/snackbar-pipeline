@@ -414,6 +414,8 @@ jobs:
                 --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }} \
                 --set SECRET.DATABASE.RDS_HOST=${{ needs.database-rds-setup.outputs.rds-conn }} \
                 --set SECRET.DATABASE.RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+                --set SECRET.ORDER_SERVICE_URL=${{ secrets.ORDER_SERVICE_URL }} \
+
 
   database-mongodb-setup:
     runs-on: ubuntu-latest

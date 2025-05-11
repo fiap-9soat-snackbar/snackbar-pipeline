@@ -216,3 +216,4 @@ jobs:
                 --set SECRET.DATABASE.APP_DB=${{ matrix.app_name }} \
                 --set SECRET.JWT.EXPIRES=${{ secrets.JWT_EXPIRES }} \
                 --set SECRET.JWT.SECRET=${{ secrets.JWT_SECRET }} \
+                --set SECRET.ORDER_SERVICE_URL=${{ secrets.ORDER_SERVICE_URL }} \

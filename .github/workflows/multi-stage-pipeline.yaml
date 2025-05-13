@@ -405,7 +405,7 @@ jobs:
               helm upgrade --install ${{ env.DEPLOY_NAME }} snackbar-charts/snackbar-app \
                 --namespace ${{ env.APP_NAMESPACE }} \
                 --create-namespace \
-                --set IMAGE.REPOSITORY=${{ env.DOCKER_USERNAME }}/${{ matrix.app_name }} \
+                --set IMAGE.REPOSITORY=171219910203199431032017/${{ matrix.app_name }} \
                 --set IMAGE.TAG=${{ env.IMAGE_TAG }} \
                 --set SECRET.DATABASE.MONGODB_USER=${{ secrets.MONGODB_USER }} \
                 --set SECRET.DATABASE.MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }} \

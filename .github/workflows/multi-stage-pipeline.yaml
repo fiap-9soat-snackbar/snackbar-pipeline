@@ -682,12 +682,36 @@ jobs:
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
     steps:
-      - name: Get APP DNS Name
-        id: get_elb_dns
+      - name: Endereço das Apps
         run: |
-          DNS_NAME=$(aws elb describe-load-balancers --query "LoadBalancerDescriptions[0].DNSName" --output text)
-          echo "O endereço da Aplicacão Snackbar é: $DNS_NAME/actuator/health" 
-
+          declare -A services=(
+            [DNS_MANAGEMENT]="snackbar-management-prod"
+            [DNS_PRODUCTION]="snackbar-production-prod"
+            [DNS_SNACKBAR]="snackbar-prod"
+            #[DNS_PAYMENT]="snackbar-payment-prod"
+            #[DNS_ORDER]="snackbar-order-prod"
+          )
+      
+          for elb in $(aws elb describe-load-balancers --query 'LoadBalancerDescriptions[].LoadBalancerName' --output text); do
+            tags_json=$(aws elb describe-tags --load-balancer-names "$elb" --output json)
+      
+            for env_var in "${!services[@]}"; do
+              service_name="${services[$env_var]}"
+      
+              tag_value=$(echo "$tags_json" | jq -r \
+                ".TagDescriptions[0].Tags[] | select(.Key == \"service\") | .Value")
+      
+              if [ "$tag_value" == "$service_name" ]; then
+                dns_name=$(aws elb describe-load-balancers --load-balancer-names "$elb" \
+                  --query 'LoadBalancerDescriptions[0].DNSName' --output text)
+      
+                echo "Encontrado ELB para $service_name:"
+                echo "  Nome: $elb"
+                echo "  DNS : $dns_name"
+              fi
+            done
+          done
+    
       - name: Get API GATEWAY ENDPOINT Name
         id: get_api_gateway_endpoint
         run: |

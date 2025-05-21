@@ -206,14 +206,14 @@ jobs:
     strategy:
       matrix:
         include:
-          #- app_name: snackbar
-          #  repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-neworder
+            repository_full_name: fiap-9soat-snackbar/snackbar-neworder
           - app_name: snackbar-management
             repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-production
             repository_full_name: fiap-9soat-snackbar/snackbar-production
-          - app_name: snackbar-payment
-            repository_full_name: fiap-9soat-snackbar/snackbar-payment
+          #- app_name: snackbar-payment
+          #  repository_full_name: fiap-9soat-snackbar/snackbar-payment
 
 
     steps:
@@ -249,14 +249,14 @@ jobs:
     strategy:
       matrix:
         include:
-          #- app_name: snackbar
-          #  repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-neworder
+            repository_full_name: fiap-9soat-snackbar/snackbar-neworder
           - app_name: snackbar-management
             repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-production
             repository_full_name: fiap-9soat-snackbar/snackbar-production
-          - app_name: snackbar-payment
-            repository_full_name: fiap-9soat-snackbar/snackbar-payment
+          #- app_name: snackbar-payment
+          #  repository_full_name: fiap-9soat-snackbar/snackbar-payment
 
 
     steps:
@@ -289,7 +289,7 @@ jobs:
           -Dsonar.projectName=${{ matrix.app_name }} \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dcoverage.minimum=0.00 \
+          -Dcoverage.minimum=0.80 \
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -307,14 +307,14 @@ jobs:
     strategy:
       matrix:
         include:
-          #- app_name: snackbar
-          #  repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-neworder
+            repository_full_name: fiap-9soat-snackbar/snackbar-neworder
           - app_name: snackbar-management
             repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-production
             repository_full_name: fiap-9soat-snackbar/snackbar-production
-          - app_name: snackbar-payment
-            repository_full_name: fiap-9soat-snackbar/snackbar-payment
+          #- app_name: snackbar-payment
+          #  repository_full_name: fiap-9soat-snackbar/snackbar-payment
 
     steps:
     - name: Checkout App Repo
@@ -368,14 +368,14 @@ jobs:
     strategy:
       matrix:
         include:
-          #- app_name: snackbar
-          #  repository_full_name: fiap-9soat-snackbar/snackbar
+          - app_name: snackbar-neworder
+            repository_full_name: fiap-9soat-snackbar/snackbar-neworder
           - app_name: snackbar-management
             repository_full_name: fiap-9soat-snackbar/snackbar-management
           - app_name: snackbar-production
             repository_full_name: fiap-9soat-snackbar/snackbar-production
-          - app_name: snackbar-payment
-            repository_full_name: fiap-9soat-snackbar/snackbar-payment
+          #- app_name: snackbar-payment
+          #  repository_full_name: fiap-9soat-snackbar/snackbar-payment
 
 
     steps:

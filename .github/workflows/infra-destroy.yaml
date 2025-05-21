@@ -84,7 +84,6 @@ jobs:
         working-directory: terraform/us-east-1/compute/securitygroup         
 
   vpc-destroy:
-    if: false
     runs-on: ubuntu-latest
     needs: [securitygroup-destroy, database-destroy,api-destroy,lambda-destroy, database-rds-destroy]
     environment:

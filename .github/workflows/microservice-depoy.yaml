@@ -2,8 +2,8 @@ name: Microservices Pipeline
 
 on:
   workflow_dispatch:
-  #repository_dispatch:
-  #  types: [app_commit]
+  repository_dispatch:
+    types: [app_commit]
 
 jobs:
   unit-tests:
